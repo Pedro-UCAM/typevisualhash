@@ -1,24 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import { useState } from 'react';
+// import './App.css';
+import Canvas from './components/Canvas'
+import CanvasContext from './components/CanvasContext';
 function App() {
+  const [canvasVal, setCanvasVal] = useState<fabric.Canvas>();
+  const setCanvas = (canv: fabric.Canvas) => {
+    setCanvasVal(canv);
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <CanvasContext.Provider
+      value={{
+        canvas: canvasVal,
+        setCanvas,
+      }}
+    >
+      {/* Tus componentes */}
+      <Canvas />
+    </CanvasContext.Provider>
     </div>
   );
 }
