@@ -2,7 +2,9 @@ import React from 'react';
 import { useState } from 'react';
 // import './App.css';
 import Canvas from './components/Canvas'
+import AddSquare from './components/AddSquare'
 import CanvasContext from './components/CanvasContext';
+
 function App() {
   const [canvasVal, setCanvasVal] = useState<fabric.Canvas>();
   const setCanvas = (canv: fabric.Canvas) => {
@@ -10,15 +12,16 @@ function App() {
   };
   return (
     <div className="App">
-    <CanvasContext.Provider
-      value={{
-        canvas: canvasVal,
-        setCanvas,
-      }}
-    >
-      {/* Tus componentes */}
-      <Canvas />
-    </CanvasContext.Provider>
+      <CanvasContext.Provider
+        value={{
+          canvas: canvasVal,
+          setCanvas,
+        }}
+      >
+        {/* Tus componentes */}
+        <Canvas />
+        <AddSquare />
+      </CanvasContext.Provider>
     </div>
   );
 }

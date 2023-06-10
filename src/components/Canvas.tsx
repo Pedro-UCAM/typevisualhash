@@ -7,8 +7,8 @@ const FabricCanvas = () => {
 
   useEffect(() => {
     const canvasInstance = new fabric.Canvas('canvas', {
-      height: 800,
-      width: 800,
+      height: 500,
+      width: 1000,
       backgroundColor: 'pink',
     });
     setCanvas(canvasInstance);

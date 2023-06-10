@@ -8,5 +8,5 @@ type CanvasContext = {
 
 export default createContext<CanvasContext>({
   canvas: undefined,
-  setCanvas: () => {},
+  setCanvas: () => { },
 });
