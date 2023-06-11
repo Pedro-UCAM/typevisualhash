@@ -3,6 +3,7 @@ import { useState } from 'react';
 // import './App.css';
 import Canvas from './components/Canvas'
 import AddSquare from './components/AddSquare'
+import OtroAddSquare from './components/AddSquare_otroborrar'
 import CanvasContext from './components/CanvasContext';
 
 function App() {
@@ -20,7 +21,8 @@ function App() {
       >
         {/* Tus componentes */}
         <Canvas />
-        <AddSquare />
+        {/* <AddSquare /> */}
+        <OtroAddSquare />
       </CanvasContext.Provider>
     </div>
   );
