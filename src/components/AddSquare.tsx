@@ -13,27 +13,40 @@ const AddSquare = () => {
 
     const addSquare = () => {
         if (canvas) {
-          const top = 100;
-          const left = 200;
+          // const top = 100;
+          // const left = 200;
           const width = 50;
           const height = 50;
           const fill = 'rgb(178,204,255)';
-          const canvasWidth = canvas.width !== undefined ? canvas.width - 200 : 0;
+          const canvasWidth = canvas.width !== undefined ? canvas.width - 100 : 0; //Margen de 100 ancho
+          const canvasHeight = canvas.height !== undefined ? canvas.height - 50 : 0;//Margen 50 alto
+          let i = 0;
 
-          for (let i = 0; i < numSquares; i++) {
-            for (let j = 0; j < numSquares; j++) {
-              const square = new fabric.Rect({
-                left: left + (i * 50),
-                top: top + (j * 50),
-                width,
-                height,
-                fill,
-              });
-      
-              canvas.add(square);
+            for (let top = 50; top < canvasHeight; top+=100) { //Empiezo en 50 de alto por el margen
+              for (let left = 100; left < canvasWidth; left+=50) { //Empiezo en 100 de ancho por el margen
+                const square = new fabric.Rect({
+                  left: left,
+                  top: top,
+                  width,
+                  height,
+                  fill: 'white',
+                  stroke: 'black',
+                  strokeWidth: 1,
+                });
+                
+                canvas.add(square);
+                i++;
+                if(i==numSquares)
+                {
+                  break;
+                }
+              }
+              if(i==numSquares)
+              {
+                break;
+              }
+
             }
-          }
-      
           canvas.renderAll();
         }
       };
