@@ -10,6 +10,7 @@ const FabricCanvas = () => {
       height: 500,
       width: 1000,
       backgroundColor: 'pink',
+      
     });
     setCanvas(canvasInstance);
   }, []);

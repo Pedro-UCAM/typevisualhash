@@ -6,36 +6,47 @@ import { fabric } from 'fabric';
 const AddSquare = () => {
     const { canvas, setCanvas } = useContext(CanvasContext);
     const [numSquares, setNumSquares] = useState<number>(0);
-    const [squares, setSquares] = useState<fabric.Object[]>([]);
-    const [selectedSquareIndex, setSelectedSquareIndex] = useState<number>(-1);
+    const [squares, setSquares] = useState<fabric.Object[]>([]); //Array de Cuadrados
+    const [selectedSquareIndex, setSelectedSquareIndex] = useState<number>(-1); //variable para seleccionar cuadrados del array cuadrados.
+    //Constantes para numeros
+    const [numArray, setNumArray] = useState<number[]>([]); //Array de Numeros
+    const [numero, setNumero] = useState<number>(0);
 
     const handleNumSquaresChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNumSquares(Number(event.target.value));
     };
 
+    const handleNumeroChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = Number(event.target.value);
+        if (!isNaN(inputValue) && inputValue >= 0 && inputValue <= 9999) {
+            setNumero(inputValue);
+        }
+    };
+
+
     //Animacion: Subraya de rojo el cuadrado, lo hace girar y luego lo borra.
     const animateSquare = (squareObj: fabric.Object) => {
         if (canvas && squareObj) {
-          let rotation = 0; // Inicializar la rotación en 0
-          const animate = () => {
-            if (squareObj) {
-              squareObj.set({
-                strokeWidth: 5,
-                scaleX: 1,
-                scaleY: 1,
-                stroke: 'red',
-                angle: rotation, // Establecer la propiedad de rotación del cuadrado
-              });
-              rotation += 1; // Aumentar el valor de rotación en cada cuadro de la animación
-              squareObj.bringToFront(); // Mover el cuadrado al frente
-              canvas.requestRenderAll();
-              window.requestAnimationFrame(animate);
-            }
-          };
-          animate();
+            let rotation = 0; // Inicializar la rotación en 0
+            const animate = () => {
+                if (squareObj) {
+                    squareObj.set({
+                        strokeWidth: 5,
+                        scaleX: 1,
+                        scaleY: 1,
+                        stroke: 'red',
+                        angle: rotation, // Establecer la propiedad de rotación del cuadrado
+                    });
+                    rotation += 1; // Aumentar el valor de rotación en cada cuadro de la animación
+                    squareObj.bringToFront(); // Mover el cuadrado al frente
+                    canvas.requestRenderAll();
+                    window.requestAnimationFrame(animate);
+                }
+            };
+            animate();
         }
-      };
-      
+    };
+
 
     const deleteSquare = () => {
         if (selectedSquareIndex >= 0 && selectedSquareIndex < squares.length && canvas) {
@@ -56,6 +67,11 @@ const AddSquare = () => {
             canvas.clear(); // Limpia el canvas (CUANDO LO LIMPIO, SE BORRA EL COLOR Y TODAS LAS PROPIEDADES DEL CANVAS PREESTABLECIDAS)
             canvas.backgroundColor = 'pink'; // Restablece el color de fondo, si quiero mantener las propiedas preestablecidas.
             setSquares([]); // Limpia el array de cuadrados, lo reinicia
+
+            // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con 0
+            const numArray = Array(numSquares).fill(0);
+            setNumArray(numArray);
+
             // const top = 100;
             // const left = 200;
             const width = 50;
@@ -93,6 +109,43 @@ const AddSquare = () => {
         }
     };
 
+    ///Numeros
+    const createNumero = (numero: number, square: fabric.Object, canvas: any) => {
+        if (square && square.left !== undefined && square.top !== undefined && square.width !== undefined && square.height !== undefined) {
+            const minumero = new fabric.Text(numero.toString(), {
+                left: square.left + square.width / 2,
+                top: square.top + square.height / 2,
+                fontSize: 20,
+                fill: 'black',
+                originX: 'center',
+                originY: 'center',
+            });
+
+            canvas.add(minumero);
+            canvas.renderAll();
+        }
+    };
+
+    const introducirNumero = () => {
+        const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
+        setNumArray((prevNumArray) => {
+            const newArray = [...prevNumArray];
+            newArray[posicion] = numero;
+            return newArray;
+        }); //Guardo el número en la posicion dentro del array.
+
+        // Ahora vamos a introducir el número dentro del cuadrado
+        const updatedSelectedSquareIndex = Number(posicion);
+        console.log(`ID del cuadrado: ${updatedSelectedSquareIndex}`);
+
+        if (updatedSelectedSquareIndex >= 0 && updatedSelectedSquareIndex < squares.length && canvas) {
+            console.log(`Entré en el IF`);
+            const square = squares[updatedSelectedSquareIndex];
+            createNumero(numero, square, canvas);
+        }
+        console.log(`La posición del número ${numero} en el array es: ${posicion}`);
+    };
+
     return (
         <div>
             <input
@@ -101,12 +154,23 @@ const AddSquare = () => {
                 onChange={handleNumSquaresChange}
             />
             <button onClick={addSquare}>Agregar cuadrado</button>
+
             <input
                 type="number"
                 value={selectedSquareIndex}
                 onChange={(event) => setSelectedSquareIndex(Number(event.target.value))}
             />
             <button onClick={deleteSquare}>Eliminar cuadrado</button>
+
+            <input
+                type="number"
+                min="0"
+                max="9999"
+                value={numero}
+                onChange={handleNumeroChange}
+            />
+            <button onClick={introducirNumero}>Insertar número</button>
+
         </div>
     );
 };
