@@ -52,6 +52,10 @@ const AddSquare = () => {
     //FUNCION PARA LLENAR EL CANVAS SEGUN EL TAMAÑO QUE INDIQUE EL USUARIO
     const addSquare = () => {
         if (canvas) {
+
+            canvas.clear(); // Limpia el canvas (CUANDO LO LIMPIO, SE BORRA EL COLOR Y TODAS LAS PROPIEDADES DEL CANVAS PREESTABLECIDAS)
+            canvas.backgroundColor = 'pink'; // Restablece el color de fondo, si quiero mantener las propiedas preestablecidas.
+            setSquares([]); // Limpia el array de cuadrados, lo reinicia
             // const top = 100;
             // const left = 200;
             const width = 50;
