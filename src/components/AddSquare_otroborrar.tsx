@@ -11,6 +11,8 @@ const AddSquare = () => {
     //Constantes para numeros
     const [numArray, setNumArray] = useState<number[]>([]); //Array de Numeros
     const [numero, setNumero] = useState<number>(0);
+    const [collisionAlgorithm, setCollisionAlgorithm] = useState('linear'); // Estado para almacenar el algoritmo de colisión seleccionado
+
 
     const handleNumSquaresChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNumSquares(Number(event.target.value));
@@ -68,9 +70,10 @@ const AddSquare = () => {
             canvas.backgroundColor = 'pink'; // Restablece el color de fondo, si quiero mantener las propiedas preestablecidas.
             setSquares([]); // Limpia el array de cuadrados, lo reinicia
 
-            // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con 0
-            const numArray = Array(numSquares).fill(0);
+            // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
+            const numArray = Array(numSquares).fill(undefined);
             setNumArray(numArray);
+
 
             // const top = 100;
             // const left = 200;
@@ -109,70 +112,205 @@ const AddSquare = () => {
         }
     };
 
-    ///Numeros
+    ///Funciones introducir Numeros
+    /**
+     * Crea y agrega un número en el centro de un cuadrado en un canvas.
+     *
+     * @param {number} numero - El número que se desea mostrar en el centro del cuadrado.
+     * @param {fabric.Object} square - El objeto cuadrado de Fabric.js en el que se colocará el número.
+     * @param {any} canvas - El canvas de Fabric.js en el que se trabajará.
+     */
     const createNumero = (numero: number, square: fabric.Object, canvas: any) => {
+        // Verifica si el cuadrado y sus propiedades necesarias están definidas
         if (square && square.left !== undefined && square.top !== undefined && square.width !== undefined && square.height !== undefined) {
+            // Crea un nuevo objeto de texto con el número
             const minumero = new fabric.Text(numero.toString(), {
-                left: square.left + square.width / 2,
-                top: square.top + square.height / 2,
-                fontSize: 20,
-                fill: 'black',
-                originX: 'center',
+                left: square.left + square.width / 2,  // Posición horizontal en el centro del cuadrado
+                top: square.top + square.height / 2,    // Posición vertical en el centro del cuadrado
+                fontSize: 20,                           // Tamaño de fuente
+                fill: 'black',                          // Color del texto (negro)
+                originX: 'center',                      // Establece el punto de origen en el centro horizontal
                 originY: 'center',
+                // Establece el punto de origen en el centro vertical
             });
 
+            // Agrega el objeto de texto al canvas
             canvas.add(minumero);
+
+            // Renderiza el canvas para que el número sea visible
             canvas.renderAll();
         }
     };
 
-    const introducirNumero = () => {
-        const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
-        setNumArray((prevNumArray) => {
-            const newArray = [...prevNumArray];
-            newArray[posicion] = numero;
-            return newArray;
-        }); //Guardo el número en la posicion dentro del array.
+    // Función para manejar las colisiones
+    function handleCollision(i: number, numero: number, posicion: number, array: number[], algoritmo: string): number {
+        let nuevaPosicion = posicion;
+        switch (algoritmo) {
+            case 'linear':
+                // Algoritmo de prueba lineal
+                // Sin colisión: h0 = H(k) = k mod NELEMS
+                // Colisión: h= G(k,i) = (H(k) + i) mod NELEMS i= [0..NELEMS]
 
-        // Ahora vamos a introducir el número dentro del cuadrado
-        const updatedSelectedSquareIndex = Number(posicion);
-        console.log(`ID del cuadrado: ${updatedSelectedSquareIndex}`);
+                // Calcula la nueva posición utilizando el algoritmo de prueba lineal
+                nuevaPosicion = (posicion + i) % array.length;
+                break;
 
-        if (updatedSelectedSquareIndex >= 0 && updatedSelectedSquareIndex < squares.length && canvas) {
-            console.log(`Entré en el IF`);
-            const square = squares[updatedSelectedSquareIndex];
-            createNumero(numero, square, canvas);
+            case 'quadratic':
+                // Implementa la lógica para el algoritmo de colisión cuadrática
+                // Puedes calcular la nueva posición cuadráticamente aquí
+                // Sin colisión: h0 = H(k) = k mod NELEMS
+                // Colisión: h= G(k,i) = (H(k) + (i*i)) mod NELEMS i= [0..NELEMS]
+                nuevaPosicion = (posicion + (i * i)) % array.length;
+                break;
+
+            case 'key-dependent':
+                // Algoritmo de colisión dependiente de clave
+                // Calcula el valor de d basado en la clave (numero)
+                const d = Math.max(1, Math.floor(numero / array.length));
+                nuevaPosicion = (posicion + (d * i)) % array.length;
+                break;
+
+            default:
+                // Manejo para un algoritmo desconocido (puedes agregar lógica adicional si es necesario)
+                break;
         }
-        console.log(`La posición del número ${numero} en el array es: ${posicion}`);
+
+        // Devuelve la nueva posición calculada
+        return nuevaPosicion;
+    }
+
+    /**
+* Genera un nuevo array basado en el array anterior (prevNumArray), actualizando un valor en una posición específica.
+*
+* @param {number[]} prevNumArray - El array original del cual se creará una copia con la actualización.
+* @param {number} numero - El número que se desea colocar en una posición específica del nuevo array.
+* @param {number} posicion - La posición en la que se colocará el número en el nuevo array.
+* @returns {number[]} - Un nuevo array con el valor actualizado en la posición especificada.
+*/
+    function calcularPosicion(numero: number): number | undefined {
+        const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
+        let nuevaPosicion: number | undefined = posicion;
+        console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
+        console.log(`${numero} mod ${squares.length} = ${posicion}`);
+
+        // Crea una copia del array original para no modificarlo directamente
+        const newArray = [...numArray];
+        let i = 0;
+        let insertado = false;
+
+        while (!insertado) {
+            // Verifica si la posición ya está ocupada
+            console.log(`Se intenta insertar en ${nuevaPosicion}`);
+            if (newArray[nuevaPosicion] === undefined) {
+                newArray[nuevaPosicion] = numero;
+                insertado = true;
+            } else {
+                // Deja un comentario o realiza alguna acción si la posición ya está ocupada
+                console.log(`La posición ${nuevaPosicion} ya está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
+                // Llama a la función handleCollision para calcular la nueva posición
+                i++;
+                nuevaPosicion = handleCollision(i, numero, posicion, newArray, collisionAlgorithm);
+            }
+
+            if ((i === newArray.length)) {
+                nuevaPosicion = undefined;
+                break;
+            }
+        }
+
+        // Actualiza el estado con el nuevo array
+        setNumArray(newArray);
+
+        return nuevaPosicion;
+    }
+
+
+    const introducirNumero = () => {
+
+        const posicion = calcularPosicion(numero);
+
+        if (posicion === undefined) {
+            console.log(`No se pudo insertar ${numero}`);
+        }
+        else {
+            // Ahora vamos a introducir el número dentro del cuadrado
+            const updatedSelectedSquareIndex = Number(posicion);
+            //console.log(`ID del cuadrado: ${updatedSelectedSquareIndex}`);
+
+            if (updatedSelectedSquareIndex >= 0 && updatedSelectedSquareIndex < squares.length && canvas) {
+                //console.log(`Entré en el IF`);
+                //Seleccionar el cuadrado correcto (por hacer)
+                const square = squares[updatedSelectedSquareIndex];
+                createNumero(numero, square, canvas);
+            }
+            console.log(`${numero} se insertó en la posición: ${posicion}`);
+        }
+
     };
 
     return (
         <div>
-            <input
-                type="number"
-                value={numSquares}
-                onChange={handleNumSquaresChange}
-            />
-            <button onClick={addSquare}>Agregar cuadrado</button>
+            <div>
+                <input
+                    type="number"
+                    min="0"
+                    max="64"
+                    value={numSquares}
+                    onChange={handleNumSquaresChange}
+                />
+                <button onClick={addSquare}>Tamaño del Array</button>
+            </div>
 
-            <input
-                type="number"
-                value={selectedSquareIndex}
-                onChange={(event) => setSelectedSquareIndex(Number(event.target.value))}
-            />
-            <button onClick={deleteSquare}>Eliminar cuadrado</button>
+            {/* <div>
+                <input
+                    type="number"
+                    value={selectedSquareIndex}
+                    onChange={(event) => setSelectedSquareIndex(Number(event.target.value))}
+                />
+                <button onClick={deleteSquare}>Eliminar cuadrado</button>
+            </div> */}
 
-            <input
-                type="number"
-                min="0"
-                max="9999"
-                value={numero}
-                onChange={handleNumeroChange}
-            />
-            <button onClick={introducirNumero}>Insertar número</button>
+            <div>
+                <input
+                    type="number"
+                    min="0"
+                    max="9999"
+                    value={numero}
+                    onChange={handleNumeroChange}
+                />
+                <button onClick={introducirNumero}>Insertar número</button>
+            </div>
 
+            <div>
+                <p>Seleccione el algoritmo de manejo de colisiones:</p>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={collisionAlgorithm === 'linear'}
+                        onChange={() => setCollisionAlgorithm('linear')}
+                    />
+                    Lineal
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={collisionAlgorithm === 'quadratic'}
+                        onChange={() => setCollisionAlgorithm('quadratic')}
+                    />
+                    Cuadrática
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={collisionAlgorithm === 'key-dependent'}
+                        onChange={() => setCollisionAlgorithm('key-dependent')}
+                    />
+                    Dependiente de Clave
+                </label>
+            </div>
         </div>
     );
-};
+}
+
 
 export default AddSquare;

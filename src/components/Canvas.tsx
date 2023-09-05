@@ -17,7 +17,6 @@ const FabricCanvas = () => {
 
   return (
     <div>
-      <h1>Fabric.js on React - fabric.Canvas('...')</h1>
       <canvas id="canvas" />
     </div>
   );

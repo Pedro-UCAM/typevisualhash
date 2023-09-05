@@ -20,9 +20,10 @@ function App() {
         }}
       >
         {/* Tus componentes */}
+        <h1>Simulador Algoritmo Hash</h1>
         <Canvas />
-        {/* <AddSquare /> */}
         <OtroAddSquare />
+        {/* <AddSquare /> */}
       </CanvasContext.Provider>
     </div>
   );
