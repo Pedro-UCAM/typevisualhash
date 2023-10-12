@@ -6,10 +6,11 @@ import { fabric } from 'fabric';
 const AddSquare = () => {
     const { canvas, setCanvas } = useContext(CanvasContext);
     const [numSquares, setNumSquares] = useState<number>(0);
+    const [numerosCanvas, setNumerosCanvas] = useState<fabric.Text[]>([]); //Array de Numeros Canvas
     const [squares, setSquares] = useState<fabric.Object[]>([]); //Array de Cuadrados
     const [selectedSquareIndex, setSelectedSquareIndex] = useState<number>(-1); //variable para seleccionar cuadrados del array cuadrados.
     //Constantes para numeros
-    const [numArray, setNumArray] = useState<number[]>([]); //Array de Numeros
+    const [numArray, setNumArray] = useState<number[]>([]); //Array de Numeros Logicos
     const [numero, setNumero] = useState<number>(0);
     const [collisionAlgorithm, setCollisionAlgorithm] = useState('linear'); // Estado para almacenar el algoritmo de colisión seleccionado
 
@@ -73,6 +74,9 @@ const AddSquare = () => {
             // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
             const numArray = Array(numSquares).fill(undefined);
             setNumArray(numArray);
+            // Haz lo mismo para el array numerosCanvas
+            const initialNumerosCanvas = Array(numSquares).fill(undefined);
+            setNumerosCanvas(initialNumerosCanvas);
 
 
             // const top = 100;
@@ -120,7 +124,7 @@ const AddSquare = () => {
      * @param {fabric.Object} square - El objeto cuadrado de Fabric.js en el que se colocará el número.
      * @param {any} canvas - El canvas de Fabric.js en el que se trabajará.
      */
-    const createNumero = (numero: number, square: fabric.Object, canvas: any) => {
+    const createNumero = (numero: number, square: fabric.Object, canvas: any): fabric.Text | undefined => {
         // Verifica si el cuadrado y sus propiedades necesarias están definidas
         if (square && square.left !== undefined && square.top !== undefined && square.width !== undefined && square.height !== undefined) {
             // Crea un nuevo objeto de texto con el número
@@ -139,7 +143,9 @@ const AddSquare = () => {
 
             // Renderiza el canvas para que el número sea visible
             canvas.renderAll();
+            return minumero;  // Devuelve el objeto de texto creado
         }
+        return undefined;
     };
 
     // Función para manejar las colisiones
@@ -239,9 +245,15 @@ const AddSquare = () => {
 
             if (updatedSelectedSquareIndex >= 0 && updatedSelectedSquareIndex < squares.length && canvas) {
                 //console.log(`Entré en el IF`);
-                //Seleccionar el cuadrado correcto (por hacer)
                 const square = squares[updatedSelectedSquareIndex];
-                createNumero(numero, square, canvas);
+                const numeroCanvas = createNumero(numero, square, canvas);
+                if (numeroCanvas) {
+                    if (posicion !== undefined) {
+                        const arrayNumerosCanvas = [...numerosCanvas];
+                        arrayNumerosCanvas[posicion] = numeroCanvas;
+                        setNumerosCanvas(arrayNumerosCanvas);
+                    }
+                }
             }
             console.log(`${numero} se insertó en la posición: ${posicion}`);
         }
