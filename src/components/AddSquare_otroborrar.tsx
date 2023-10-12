@@ -8,6 +8,7 @@ const AddSquare = () => {
     const [numSquares, setNumSquares] = useState<number>(0);
     const [numerosCanvas, setNumerosCanvas] = useState<fabric.Text[]>([]); //Array de Numeros Canvas
     const [squares, setSquares] = useState<fabric.Object[]>([]); //Array de Cuadrados
+    const [squaresLastAnimation, setSquaresLastAnimation] = useState<fabric.Object[]>([]); //Cuadrados de la Ultima Animacion
     const [selectedSquareIndex, setSelectedSquareIndex] = useState<number>(-1); //variable para seleccionar cuadrados del array cuadrados.
     //Constantes para numeros
     const [numArray, setNumArray] = useState<number[]>([]); //Array de Numeros Logicos
@@ -50,6 +51,41 @@ const AddSquare = () => {
         }
     };
 
+    const squareAnimation = (squareObj: fabric.Object, animationType: string) => {
+        if (canvas && squareObj) {
+            let strokeColor = 'black'; // Color por defecto
+            let strokeWidth = 2; // Color por defecto
+            //let fillColor = 'white'; // Color por defecto
+    
+            switch (animationType) {
+                case 'select':
+                    strokeColor = 'blue';
+                    break;
+                case 'ok':
+                    strokeColor = 'green';
+                    break;
+                case 'fail':
+                    strokeColor = 'red';
+                    break;
+                case 'reset':
+                    strokeColor = 'black';
+                    strokeWidth = 1;
+                    break;
+                default:
+                    console.error('Tipo de animación no reconocida:', animationType);
+                    return; // Salir de la función si el tipo de animación no es reconocido
+            }
+    
+            squareObj.set({
+                strokeWidth: strokeWidth,
+                stroke: strokeColor
+            });
+            //squareObj.bringToFront(); // Mover el cuadrado al frente
+            canvas.requestRenderAll();
+        }
+    };
+    
+
 
     const deleteSquare = () => {
         if (selectedSquareIndex >= 0 && selectedSquareIndex < squares.length && canvas) {
@@ -89,7 +125,7 @@ const AddSquare = () => {
             let i = 0;
 
             for (let top = 50; top < canvasHeight; top += 100) { //Empiezo en 50 de alto por el margen
-                for (let left = 100; left < canvasWidth; left += 50) { //Empiezo en 100 de ancho por el margen
+                for (let left = 100; left < canvasWidth; left += 55) { //Empiezo en 100 de ancho por el margen
                     const square = new fabric.Rect({
                         left: left,
                         top: top,
@@ -140,6 +176,7 @@ const AddSquare = () => {
 
             // Agrega el objeto de texto al canvas
             canvas.add(minumero);
+            console.log("numero insertado")
 
             // Renderiza el canvas para que el número sea visible
             canvas.renderAll();
@@ -193,69 +230,102 @@ const AddSquare = () => {
 * @param {number} posicion - La posición en la que se colocará el número en el nuevo array.
 * @returns {number[]} - Un nuevo array con el valor actualizado en la posición especificada.
 */
-    function calcularPosicion(numero: number): number | undefined {
-        const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
-        let nuevaPosicion: number | undefined = posicion;
-        console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
-        console.log(`${numero} mod ${squares.length} = ${posicion}`);
+async function calcularPosicion(numero: number): Promise<number | undefined> {
+    const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
+    let nuevaPosicion: number | undefined = posicion;
+    console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
+    console.log(`${numero} mod ${squares.length} = ${posicion}`);
 
-        // Crea una copia del array original para no modificarlo directamente
-        const newArray = [...numArray];
-        let i = 0;
-        let insertado = false;
+    // Crea una copia del array original para no modificarlo directamente
+    const newArray = [...numArray];
+    let i = 0;
+    let insertado = false;
 
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const insertarConAnimacion = async () => {
         while (!insertado) {
             // Verifica si la posición ya está ocupada
             console.log(`Se intenta insertar en ${nuevaPosicion}`);
-            if (newArray[nuevaPosicion] === undefined) {
-                newArray[nuevaPosicion] = numero;
+            // Animación seleccionar cuadrado
+            const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
+            setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation
+            squareAnimation(square, "select");
+            await delay(1000); // Pausa de 2 segundos
+
+            if (newArray[Number(nuevaPosicion)] === undefined) {
+                squareAnimation(square, "ok");
+                newArray[Number(nuevaPosicion)] = numero;
                 insertado = true;
             } else {
                 // Deja un comentario o realiza alguna acción si la posición ya está ocupada
                 console.log(`La posición ${nuevaPosicion} ya está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
+                squareAnimation(square, "fail");
                 // Llama a la función handleCollision para calcular la nueva posición
                 i++;
                 nuevaPosicion = handleCollision(i, numero, posicion, newArray, collisionAlgorithm);
             }
 
-            if ((i === newArray.length)) {
-                nuevaPosicion = undefined;
-                break;
+            if (i === newArray.length) {
+                return undefined;
             }
         }
 
         // Actualiza el estado con el nuevo array
         setNumArray(newArray);
+    };
 
-        return nuevaPosicion;
-    }
+    // Llamar a la función de inserción con animación y esperar a que termine
+    await insertarConAnimacion();
+
+    return nuevaPosicion;
+}
 
 
-    const introducirNumero = () => {
 
-        const posicion = calcularPosicion(numero);
+
+    const introducirNumero = async () => {
+
+        //Reseteo la animacion anterior
+        if (squaresLastAnimation.length > 0) {
+            // Recorre cada cuadrado en squaresLastAnimation y llama a la función squareAnimation con "reset"
+            squaresLastAnimation.forEach(squareObj => {
+              squareAnimation(squareObj, "reset");
+            });
+          
+            // Limpia el array squaresLastAnimation, dejándolo vacío
+            setSquaresLastAnimation([]);
+          }
+          
+        const posicion = await calcularPosicion(numero);  // Usa await para esperar el resultado
 
         if (posicion === undefined) {
             console.log(`No se pudo insertar ${numero}`);
         }
         else {
+           // console.log(`Entro en el else de introducirNumero`);
             // Ahora vamos a introducir el número dentro del cuadrado
             const updatedSelectedSquareIndex = Number(posicion);
             //console.log(`ID del cuadrado: ${updatedSelectedSquareIndex}`);
 
             if (updatedSelectedSquareIndex >= 0 && updatedSelectedSquareIndex < squares.length && canvas) {
+                //console.log(`Entro en el if del if de introducirNumero`);
                 //console.log(`Entré en el IF`);
                 const square = squares[updatedSelectedSquareIndex];
+                //console.log("Llamo a createNumero")
                 const numeroCanvas = createNumero(numero, square, canvas);
+                //console.log("He creado el numero: ", numeroCanvas)
+                //Guardo el Numero en el Array de Numeros Canvas para poder animarlo o eliminarlo en el futuro
                 if (numeroCanvas) {
                     if (posicion !== undefined) {
                         const arrayNumerosCanvas = [...numerosCanvas];
-                        arrayNumerosCanvas[posicion] = numeroCanvas;
+                        arrayNumerosCanvas[Number(posicion)] = numeroCanvas;
                         setNumerosCanvas(arrayNumerosCanvas);
+                        //console.log(arrayNumerosCanvas);
                     }
                 }
             }
-            console.log(`${numero} se insertó en la posición: ${posicion}`);
+            console.log(`${numero} se insertó en la posición: ${posicion}`, posicion);
         }
 
     };
@@ -266,7 +336,7 @@ const AddSquare = () => {
                 <input
                     type="number"
                     min="0"
-                    max="64"
+                    max="60"
                     value={numSquares}
                     onChange={handleNumSquaresChange}
                 />
