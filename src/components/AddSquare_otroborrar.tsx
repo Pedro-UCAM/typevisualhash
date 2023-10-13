@@ -91,7 +91,7 @@ const AddSquare = () => {
     const squareAnimation = (squareObj: fabric.Object, animationType: string) => {
         if (canvas && squareObj) {
             let strokeColor = 'black'; // Color por defecto
-            let strokeWidth = 2; // Color por defecto
+            let strokeWidth = 2;
             //let fillColor = 'white'; // Color por defecto
 
             switch (animationType) {
@@ -100,6 +100,7 @@ const AddSquare = () => {
                     break;
                 case 'ok':
                     strokeColor = 'green';
+                    strokeWidth = 3;
                     break;
                 case 'fail':
                     strokeColor = 'red';
