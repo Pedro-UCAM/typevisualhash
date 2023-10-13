@@ -160,9 +160,9 @@ const AddSquare = () => {
             const height = 50;
             const fill = 'rgb(178,204,255)';
             const canvasWidth = canvas.width !== undefined ? canvas.width - 100 : 0; //Margen de 100 ancho
-            const canvasHeight = canvas.height !== undefined ? canvas.height - 50 : 0;//Margen 50 alto
+            const canvasHeight = canvas.height !== undefined ? canvas.height - 50 : 0; //Margen 50 alto
             let i = 0;
-
+            
             for (let top = 50; top < canvasHeight; top += 100) { //Empiezo en 50 de alto por el margen
                 for (let left = 100; left < canvasWidth; left += 55) { //Empiezo en 100 de ancho por el margen
                     const square = new fabric.Rect({
@@ -174,8 +174,22 @@ const AddSquare = () => {
                         stroke: 'black',
                         strokeWidth: 1,
                     });
-
+            
+                    // Añadir el cuadrado al canvas
                     canvas.add(square);
+            
+                    // Crear objeto de texto para el índice
+                    const indexText = new fabric.Text(i.toString(), {
+                        left: left + width / 2, // Centrar horizontalmente respecto al cuadrado
+                        top: top + height + 5,  // Colocar debajo del cuadrado con un pequeño margen
+                        fontSize: 12,
+                        originX: 'center', // Esto asegura que el texto se centre en su posición
+                        originY: 'top'
+                    });
+            
+                    // Añadir el texto al canvas
+                    canvas.add(indexText);
+            
                     setSquares((prevSquares) => [...prevSquares, square]);
                     i++;
                     if (i == numSquares) {
@@ -185,7 +199,6 @@ const AddSquare = () => {
                 if (i == numSquares) {
                     break;
                 }
-
             }
             canvas.renderAll();
         }
@@ -269,81 +282,81 @@ const AddSquare = () => {
 * @param {number} posicion - La posición en la que se colocará el número en el nuevo array.
 * @returns {number[]} - Un nuevo array con el valor actualizado en la posición especificada.
 */
-async function calcularPosicion(numero: number): Promise<number | undefined> {
-    const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
-    let nuevaPosicion: number | undefined = posicion;
-    console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
-    console.log(`${numero} mod ${squares.length} = ${posicion}`);
+    async function calcularPosicion(numero: number): Promise<number | undefined> {
+        const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
+        let nuevaPosicion: number | undefined = posicion;
+        console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
+        console.log(`${numero} mod ${squares.length} = ${posicion}`);
 
-    // Crea una copia del array original para no modificarlo directamente
-    const newArray = [...numArray];
-    let i = 0;
-    let insertado = false;
-    const intentosPrevios: { [key: number]: number } = [];
+        // Crea una copia del array original para no modificarlo directamente
+        const newArray = [...numArray];
+        let i = 0;
+        let insertado = false;
+        const intentosPrevios: { [key: number]: number } = [];
 
-    const delay = () => new Promise(resolve => setTimeout(resolve, delayTime.current));
+        const delay = () => new Promise(resolve => setTimeout(resolve, delayTime.current));
 
-    const insertarConAnimacion = async (): Promise<number | undefined> => {
-        while (!insertado) {
-            //Comprobacion para cancelar la accion si el usuario lo solicita.
-            if (animationCancelled) {
-                return; // Sale de la función
-            }
-            // Verifica si la posición ya está ocupada
-            console.log(`Se intenta insertar en ${nuevaPosicion}`);
-            // Animación seleccionar cuadrado
-            const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
-            setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation
-            squareAnimation(square, "select");
-            await delay();
+        const insertarConAnimacion = async (): Promise<number | undefined> => {
+            while (!insertado) {
+                //Comprobacion para cancelar la accion si el usuario lo solicita.
+                if (animationCancelled) {
+                    return; // Sale de la función
+                }
+                // Verifica si la posición ya está ocupada
+                console.log(`Se intenta insertar en ${nuevaPosicion}`);
+                // Animación seleccionar cuadrado
+                const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
+                setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation
+                squareAnimation(square, "select");
+                await delay();
 
-            if (newArray[Number(nuevaPosicion)] === undefined) {
-                squareAnimation(square, "ok");
-                newArray[Number(nuevaPosicion)] = numero;
-                insertado = true;
-            } else {
-                // Deja un comentario o realiza alguna acción si la posición ya está ocupada
-                console.log(`La posición ${nuevaPosicion} ya está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
-                squareAnimation(square, "fail");
-                
-                // Incrementa o inicializa el conteo de intentos para esta posición
-                intentosPrevios[Number(nuevaPosicion)] = (intentosPrevios[Number(nuevaPosicion)] || 0) + 1;
+                if (newArray[Number(nuevaPosicion)] === undefined) {
+                    squareAnimation(square, "ok");
+                    newArray[Number(nuevaPosicion)] = numero;
+                    insertado = true;
+                } else {
+                    // Deja un comentario o realiza alguna acción si la posición ya está ocupada
+                    console.log(`La posición ${nuevaPosicion} ya está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
+                    squareAnimation(square, "fail");
 
-                // Si la posición se ha intentado 3 veces, detén la animación y muestra un error
-                if (intentosPrevios[Number(nuevaPosicion)] >= 3) {
-                    console.error(`No se pudo insertar ${numero}. Se detectó un bucle en la posición ${nuevaPosicion}.`);
-                    return undefined;
+                    // Incrementa o inicializa el conteo de intentos para esta posición
+                    intentosPrevios[Number(nuevaPosicion)] = (intentosPrevios[Number(nuevaPosicion)] || 0) + 1;
+
+                    // Si la posición se ha intentado 3 veces, detén la animación y muestra un error
+                    if (intentosPrevios[Number(nuevaPosicion)] >= 3) {
+                        console.error(`No se pudo insertar ${numero}. Se detectó un bucle en la posición ${nuevaPosicion}.`);
+                        return undefined;
+                    }
+
+                    // Llama a la función handleCollision para calcular la nueva posición
+                    i++;
+                    nuevaPosicion = handleCollision(i, numero, posicion, newArray, collisionAlgorithm);
                 }
 
-                // Llama a la función handleCollision para calcular la nueva posición
-                i++;
-                nuevaPosicion = handleCollision(i, numero, posicion, newArray, collisionAlgorithm);
+                if (i === newArray.length) {
+                    return undefined;
+                }
             }
 
-            if (i === newArray.length) {
-                return undefined;
-            }
+            // Actualiza el estado con el nuevo array
+            setNumArray(newArray);
+            return nuevaPosicion;
+        };
+        //Comprobacion para cancelar la accion si el usuario lo solicita.
+        if (animationCancelled) {
+            setAnimationCancelled(false); // Restablece el estado para usos futuros
+            return undefined; // Sale de la función
+        }
+        // Llamar a la función de inserción con animación y esperar a que termine
+        const result = await insertarConAnimacion();
+
+        // Si insertarConAnimacion devuelve undefined, también devolvemos undefined desde calcularPosicion
+        if (result === undefined) {
+            return undefined;
         }
 
-        // Actualiza el estado con el nuevo array
-        setNumArray(newArray);
-        return nuevaPosicion;
-    };
-    //Comprobacion para cancelar la accion si el usuario lo solicita.
-    if (animationCancelled) {
-        setAnimationCancelled(false); // Restablece el estado para usos futuros
-        return undefined; // Sale de la función
+        return result;
     }
-    // Llamar a la función de inserción con animación y esperar a que termine
-    const result = await insertarConAnimacion();
-
-    // Si insertarConAnimacion devuelve undefined, también devolvemos undefined desde calcularPosicion
-    if (result === undefined) {
-        return undefined;
-    }
-
-    return result;
-}
 
 
 
