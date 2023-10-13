@@ -23,6 +23,8 @@ const AddSquare = () => {
     //const [delayTime, setDelayTime] = useState(1000); // Comienza con el valor predeterminado de 1 segundo.
     const delayTime = useRef(1000);
 
+    let currentArrowGroup: any = null; // Esta variable mantiene la referencia al grupo de flechas actual en el canvas: any = null; // Esta variable mantiene la referencia a la flecha actual en el canvas
+
 
     const handleNumSquaresChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const valorIntroducido = Number(event.target.value);
@@ -123,6 +125,49 @@ const AddSquare = () => {
         }
     };
 
+    function moveArrow(square: any): void {
+        const arrowBodyWidth = 5;  // Cambiamos el ancho del cuerpo de la flecha
+        const arrowBodyHeight = 15;
+        const arrowTipSize = 10;  // Cambiamos el tamaño de la punta de la flecha
+    
+        const arrowBody = new fabric.Rect({
+            width: arrowBodyWidth,
+            height: arrowBodyHeight,
+            fill: 'blue',
+            originX: 'center',
+            originY: 'bottom'
+        });
+    
+        const arrowTip = new fabric.Triangle({
+            width: 15,
+            height: 10,
+            fill: 'blue',
+            originX: 'center',
+            originY: 'bottom',   // Cambiamos 'top' a 'bottom' para que el triángulo se sitúe en la parte inferior
+            angle: 180,
+            top: -5
+        });
+    
+        const arrowGroup = new fabric.Group([arrowBody, arrowTip], {
+            left: (square.left + square.width / 2)-7,
+            top: square.top - arrowTipSize - arrowBodyHeight,  // Ajustamos la posición de la flecha para que esté justo encima del cuadrado
+            selectable: false
+        });
+    
+        // Aplicamos el zoom
+        const scaleFactor = 1;  // 
+        arrowGroup.scale(scaleFactor);
+    
+        if (currentArrowGroup && canvas) {
+            canvas.remove(currentArrowGroup);
+        }
+        if (canvas) {
+            canvas.add(arrowGroup);
+        }
+        currentArrowGroup = arrowGroup;
+    }
+    
+
 
 
     const deleteSquare = () => {
@@ -162,7 +207,7 @@ const AddSquare = () => {
             const canvasWidth = canvas.width !== undefined ? canvas.width - 100 : 0; //Margen de 100 ancho
             const canvasHeight = canvas.height !== undefined ? canvas.height - 50 : 0; //Margen 50 alto
             let i = 0;
-            
+
             for (let top = 50; top < canvasHeight; top += 100) { //Empiezo en 50 de alto por el margen
                 for (let left = 100; left < canvasWidth; left += 55) { //Empiezo en 100 de ancho por el margen
                     const square = new fabric.Rect({
@@ -174,10 +219,10 @@ const AddSquare = () => {
                         stroke: 'black',
                         strokeWidth: 1,
                     });
-            
+
                     // Añadir el cuadrado al canvas
                     canvas.add(square);
-            
+
                     // Crear objeto de texto para el índice
                     const indexText = new fabric.Text(i.toString(), {
                         left: left + width / 2, // Centrar horizontalmente respecto al cuadrado
@@ -186,10 +231,10 @@ const AddSquare = () => {
                         originX: 'center', // Esto asegura que el texto se centre en su posición
                         originY: 'top'
                     });
-            
+
                     // Añadir el texto al canvas
                     canvas.add(indexText);
-            
+
                     setSquares((prevSquares) => [...prevSquares, square]);
                     i++;
                     if (i == numSquares) {
@@ -307,6 +352,7 @@ const AddSquare = () => {
                 // Animación seleccionar cuadrado
                 const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
                 setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation
+                moveArrow(square); //Funcion que hace aparecer la flecha encima del cuadrado y la va moviendo.
                 squareAnimation(square, "select");
                 await delay();
 
@@ -336,6 +382,11 @@ const AddSquare = () => {
                 if (i === newArray.length) {
                     return undefined;
                 }
+            }
+
+            if (currentArrowGroup && canvas) {
+                canvas.remove(currentArrowGroup);
+                currentArrowGroup = null;
             }
 
             // Actualiza el estado con el nuevo array
