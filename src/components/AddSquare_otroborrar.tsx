@@ -1,11 +1,11 @@
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import React from 'react';
 import CanvasContext from './CanvasContext';
 import { fabric } from 'fabric';
 
 const AddSquare = () => {
     const { canvas, setCanvas } = useContext(CanvasContext);
-    const [numSquares, setNumSquares] = useState<number>(0);
+    const [numSquares, setNumSquares] = useState<number>(0); //Tamaño de la Tabla Hash
     const [numerosCanvas, setNumerosCanvas] = useState<fabric.Text[]>([]); //Array de Numeros Canvas
     const [squares, setSquares] = useState<fabric.Object[]>([]); //Array de Cuadrados
     const [squaresLastAnimation, setSquaresLastAnimation] = useState<fabric.Object[]>([]); //Cuadrados de la Ultima Animacion
@@ -15,9 +15,23 @@ const AddSquare = () => {
     const [numero, setNumero] = useState<number>(0);
     const [collisionAlgorithm, setCollisionAlgorithm] = useState('linear'); // Estado para almacenar el algoritmo de colisión seleccionado
 
+    //Estados de Control de Errores
+    const [animationRunning, setAnimationRunning] = useState(false);
+    const [animationCancelled, setAnimationCancelled] = useState(false);
+
+    //Delay de la animacion
+    //const [delayTime, setDelayTime] = useState(1000); // Comienza con el valor predeterminado de 1 segundo.
+    const delayTime = useRef(1000);
+
 
     const handleNumSquaresChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setNumSquares(Number(event.target.value));
+        const valorIntroducido = Number(event.target.value);
+
+        if (valorIntroducido < 0 || valorIntroducido > 60) {
+            setNumSquares(60);
+        } else {
+            setNumSquares(valorIntroducido);
+        }
     };
 
     const handleNumeroChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +40,29 @@ const AddSquare = () => {
             setNumero(inputValue);
         }
     };
+
+    const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseInt(event.target.value);
+
+        switch (value) {
+            case 0:
+                delayTime.current = 2000; // x0.5 velocidad
+                break;
+            case 1:
+                delayTime.current = 1000; // x1 velocidad
+                break;
+            case 2:
+                delayTime.current = 500;  // x2 velocidad
+                break;
+            case 3:
+                delayTime.current = 250;  // x4 velocidad
+                break;
+            default:
+                delayTime.current = 1000;
+        }
+    };
+
+
 
 
     //Animacion: Subraya de rojo el cuadrado, lo hace girar y luego lo borra.
@@ -56,7 +93,7 @@ const AddSquare = () => {
             let strokeColor = 'black'; // Color por defecto
             let strokeWidth = 2; // Color por defecto
             //let fillColor = 'white'; // Color por defecto
-    
+
             switch (animationType) {
                 case 'select':
                     strokeColor = 'blue';
@@ -75,7 +112,7 @@ const AddSquare = () => {
                     console.error('Tipo de animación no reconocida:', animationType);
                     return; // Salir de la función si el tipo de animación no es reconocido
             }
-    
+
             squareObj.set({
                 strokeWidth: strokeWidth,
                 stroke: strokeColor
@@ -84,7 +121,7 @@ const AddSquare = () => {
             canvas.requestRenderAll();
         }
     };
-    
+
 
 
     const deleteSquare = () => {
@@ -106,6 +143,7 @@ const AddSquare = () => {
             canvas.clear(); // Limpia el canvas (CUANDO LO LIMPIO, SE BORRA EL COLOR Y TODAS LAS PROPIEDADES DEL CANVAS PREESTABLECIDAS)
             canvas.backgroundColor = 'pink'; // Restablece el color de fondo, si quiero mantener las propiedas preestablecidas.
             setSquares([]); // Limpia el array de cuadrados, lo reinicia
+
 
             // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
             const numArray = Array(numSquares).fill(undefined);
@@ -176,7 +214,7 @@ const AddSquare = () => {
 
             // Agrega el objeto de texto al canvas
             canvas.add(minumero);
-            console.log("numero insertado")
+            //console.log("numero insertado")
 
             // Renderiza el canvas para que el número sea visible
             canvas.renderAll();
@@ -240,18 +278,23 @@ async function calcularPosicion(numero: number): Promise<number | undefined> {
     const newArray = [...numArray];
     let i = 0;
     let insertado = false;
+    const intentosPrevios: { [key: number]: number } = [];
 
-    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const delay = () => new Promise(resolve => setTimeout(resolve, delayTime.current));
 
-    const insertarConAnimacion = async () => {
+    const insertarConAnimacion = async (): Promise<number | undefined> => {
         while (!insertado) {
+            //Comprobacion para cancelar la accion si el usuario lo solicita.
+            if (animationCancelled) {
+                return; // Sale de la función
+            }
             // Verifica si la posición ya está ocupada
             console.log(`Se intenta insertar en ${nuevaPosicion}`);
             // Animación seleccionar cuadrado
             const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
             setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation
             squareAnimation(square, "select");
-            await delay(1000); // Pausa de 2 segundos
+            await delay();
 
             if (newArray[Number(nuevaPosicion)] === undefined) {
                 squareAnimation(square, "ok");
@@ -261,6 +304,16 @@ async function calcularPosicion(numero: number): Promise<number | undefined> {
                 // Deja un comentario o realiza alguna acción si la posición ya está ocupada
                 console.log(`La posición ${nuevaPosicion} ya está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
                 squareAnimation(square, "fail");
+                
+                // Incrementa o inicializa el conteo de intentos para esta posición
+                intentosPrevios[Number(nuevaPosicion)] = (intentosPrevios[Number(nuevaPosicion)] || 0) + 1;
+
+                // Si la posición se ha intentado 3 veces, detén la animación y muestra un error
+                if (intentosPrevios[Number(nuevaPosicion)] >= 3) {
+                    console.error(`No se pudo insertar ${numero}. Se detectó un bucle en la posición ${nuevaPosicion}.`);
+                    return undefined;
+                }
+
                 // Llama a la función handleCollision para calcular la nueva posición
                 i++;
                 nuevaPosicion = handleCollision(i, numero, posicion, newArray, collisionAlgorithm);
@@ -273,37 +326,51 @@ async function calcularPosicion(numero: number): Promise<number | undefined> {
 
         // Actualiza el estado con el nuevo array
         setNumArray(newArray);
+        return nuevaPosicion;
     };
-
+    //Comprobacion para cancelar la accion si el usuario lo solicita.
+    if (animationCancelled) {
+        setAnimationCancelled(false); // Restablece el estado para usos futuros
+        return undefined; // Sale de la función
+    }
     // Llamar a la función de inserción con animación y esperar a que termine
-    await insertarConAnimacion();
+    const result = await insertarConAnimacion();
 
-    return nuevaPosicion;
+    // Si insertarConAnimacion devuelve undefined, también devolvemos undefined desde calcularPosicion
+    if (result === undefined) {
+        return undefined;
+    }
+
+    return result;
 }
+
+
 
 
 
 
     const introducirNumero = async () => {
 
+        setAnimationRunning(true);
+
         //Reseteo la animacion anterior
         if (squaresLastAnimation.length > 0) {
             // Recorre cada cuadrado en squaresLastAnimation y llama a la función squareAnimation con "reset"
             squaresLastAnimation.forEach(squareObj => {
-              squareAnimation(squareObj, "reset");
+                squareAnimation(squareObj, "reset");
             });
-          
+
             // Limpia el array squaresLastAnimation, dejándolo vacío
             setSquaresLastAnimation([]);
-          }
-          
+        }
+
         const posicion = await calcularPosicion(numero);  // Usa await para esperar el resultado
 
         if (posicion === undefined) {
             console.log(`No se pudo insertar ${numero}`);
         }
         else {
-           // console.log(`Entro en el else de introducirNumero`);
+            // console.log(`Entro en el else de introducirNumero`);
             // Ahora vamos a introducir el número dentro del cuadrado
             const updatedSelectedSquareIndex = Number(posicion);
             //console.log(`ID del cuadrado: ${updatedSelectedSquareIndex}`);
@@ -327,7 +394,7 @@ async function calcularPosicion(numero: number): Promise<number | undefined> {
             }
             console.log(`${numero} se insertó en la posición: ${posicion}`, posicion);
         }
-
+        setAnimationRunning(false);
     };
 
     return (
@@ -360,7 +427,26 @@ async function calcularPosicion(numero: number): Promise<number | undefined> {
                     value={numero}
                     onChange={handleNumeroChange}
                 />
-                <button onClick={introducirNumero}>Insertar número</button>
+                <button onClick={introducirNumero} disabled={animationRunning}>Insertar número</button>
+                {/* <button onClick={() => setAnimationCancelled(true)} disabled={!animationRunning}>Cancelar animación</button> */}
+                <div style={{ position: 'relative', width: '100%' }}>
+                    <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        step="1"
+                        defaultValue="1"
+                        onChange={handleSliderChange}
+                        style={{ width: '100%' }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
+                        <span style={{ flex: '1', textAlign: 'center' }}>x0.5</span>
+                        <span style={{ flex: '1', textAlign: 'center' }}>x1</span>
+                        <span style={{ flex: '1', textAlign: 'center' }}>x2</span>
+                        <span style={{ flex: '1', textAlign: 'center' }}>x4</span>
+                    </div>
+                </div>
+
             </div>
 
             <div>
