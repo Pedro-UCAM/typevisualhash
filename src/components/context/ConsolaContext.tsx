@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 import Consola from '../consola/Consola';
 
 interface ConsolaContextType {
+    mensajes: { mensaje: string, numero?: number }[];
     enviarMensaje: (mensaje: string, numero?: number) => void;
 }
 
@@ -20,9 +21,9 @@ export const ConsolaProvider: React.FC<React.PropsWithChildren<{}>> = ({ childre
     }
 
     return (
-        <ConsolaContext.Provider value={{ enviarMensaje }}>
+        <ConsolaContext.Provider value={{ mensajes, enviarMensaje }}>
             {children}
-            <Consola mensajes={mensajes} />
+            {/* <Consola mensajes={mensajes} /> */}
         </ConsolaContext.Provider>
     );
 }
