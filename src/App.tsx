@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
-//import './App.css';
-import Canvas from './components/Canvas'
+import './App.css';
+import Canvas from './components/canvas/Canvas'
 import MenuConfiguracion from './components/AddSquare_otroborrar'
 import CanvasContext from './components/context/CanvasContext';
 import { ConsolaProvider} from './components/context/ConsolaContext';
@@ -31,6 +31,7 @@ function App() {
             {/* Deberás envolver la consola en un div para aplicarle los estilos */}
             <div className="consola">
               {/* Aquí deberás invocar a tu componente de Consola. Asumo que tienes alguna forma de hacerlo a través de ConsolaProvider. */}
+              {/* <h2>Consola: </h2> */}
               <ConsolaWrapper />
             </div>
           </div>

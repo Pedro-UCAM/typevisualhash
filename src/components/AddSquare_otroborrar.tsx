@@ -95,19 +95,19 @@ const AddSquare = () => {
     const squareAnimation = (squareObj: fabric.Object, animationType: string) => {
         if (canvas && squareObj) {
             let strokeColor = 'black'; // Color por defecto
-            let strokeWidth = 2;
+            let strokeWidth = 3;
             //let fillColor = 'white'; // Color por defecto
 
             switch (animationType) {
                 case 'select':
-                    strokeColor = 'blue';
+                    strokeColor = '#6EC4DB';
                     break;
                 case 'ok':
-                    strokeColor = 'green';
+                    strokeColor = '#66AB8C';
                     strokeWidth = 3;
                     break;
                 case 'fail':
-                    strokeColor = 'red';
+                    strokeColor = '#FA7C92';
                     break;
                 case 'reset':
                     strokeColor = 'black';
@@ -135,7 +135,7 @@ const AddSquare = () => {
         const arrowBody = new fabric.Rect({
             width: arrowBodyWidth,
             height: arrowBodyHeight,
-            fill: 'blue',
+            fill: '#6EC4DB',
             originX: 'center',
             originY: 'bottom'
         });
@@ -143,7 +143,7 @@ const AddSquare = () => {
         const arrowTip = new fabric.Triangle({
             width: 15,
             height: 10,
-            fill: 'blue',
+            fill: '#6EC4DB',
             originX: 'center',
             originY: 'bottom',   // Cambiamos 'top' a 'bottom' para que el triángulo se sitúe en la parte inferior
             angle: 180,
@@ -188,9 +188,9 @@ const AddSquare = () => {
     const addSquare = () => {
         if (canvas) {
 
-            canvas.clear(); // Limpia el canvas (CUANDO LO LIMPIO, SE BORRA EL COLOR Y TODAS LAS PROPIEDADES DEL CANVAS PREESTABLECIDAS)
-            canvas.backgroundColor = 'pink'; // Restablece el color de fondo, si quiero mantener las propiedas preestablecidas.
-            setSquares([]); // Limpia el array de cuadrados, lo reinicia
+            canvas.clear();
+            canvas.backgroundColor = '#ffffff'; // Restablece el color de fondo original
+            setSquares([]);
 
 
             // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
@@ -351,7 +351,7 @@ const AddSquare = () => {
                 }
                 // Verifica si la posición ya está ocupada
                 console.log(`Se intenta insertar en ${nuevaPosicion}`);
-                enviarMensaje(`Intento en <b[${nuevaPosicion}]>`);
+                enviarMensaje(`Se <bintenta> insertar en la posición <b[${nuevaPosicion}]>`);
                 // Animación seleccionar cuadrado
                 const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
                 setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation

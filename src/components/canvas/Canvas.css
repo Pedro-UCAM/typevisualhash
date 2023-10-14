@@ -1,0 +1,13 @@
+.canvas-wrapper {
+    border: 2px solid #4040407f; /* Borde verde, acorde con la consola */
+    border-radius: 5px;
+    margin-top: 20px; /* Espacio arriba para separarlo de otros componentes, si es necesario */
+    overflow: hidden; /* En caso de que el canvas exceda los límites por alguna razón, recortamos el contenido */
+    background-color: #ffffff; /* Fondo verde oscuro */
+}
+
+#canvas {
+    display: block;
+    margin: 0 auto; /* Centramos el canvas dentro de su contenedor */
+    border-radius: 3px; /* Suavizamos los bordes */
+}

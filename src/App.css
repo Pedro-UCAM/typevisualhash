@@ -5,7 +5,10 @@
   align-items: center;
   font-family: 'Arial', sans-serif;
   height: 100vh;
+  /* Cambia el color de fondo a tu elección */
+  background-color: #ecececf0; /* Cambia #ff0000 al código de color que desees */
 }
+
 
 .header {
   margin-top: 10px;
@@ -28,8 +31,8 @@
 .consola {
   flex: 2; /* Esta proporción determina el espacio relativo entre Canvas y Consola */
   /* background-color: black; Color de prueba */
-  height: 400px; /* Puedes ajustar según tus preferencias */
-  color: white; /* Color de texto */
+  height: 530px; /* Puedes ajustar según tus preferencias */
+  color: rgb(0, 0, 0); /* Color de texto */
   padding: 10px;
 }
 

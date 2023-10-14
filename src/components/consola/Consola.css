@@ -3,9 +3,39 @@
     gap: 10px;
 }
 
+.console-wrapper {
+    border: 2px solid #6a6a6a;
+    border-radius: 5px;
+    font-family: 'Courier New', Courier, monospace; /* Tipografía típica de consola */
+    background-color: #000; /* Fondo negro típico de consola */
+    color: #FFFFFF; /* Texto blanco */
+}
+
+.console-header {
+    background-color: #6EC4DB;
+    color: #FFFFFF;
+    padding: 5px 10px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    font-weight: bold;
+}
+
 .console-content {
-    border: 1px solid #000000;
+    border-top: 1px solid #6EC4DB;
     padding: 10px;
-    max-height: 200px;
+    max-height: 450px;
+    min-height: 200px;  /* Añadido min-height */
     overflow-y: auto;
+}
+
+p {
+    margin: 5px 0;
+}
+
+.last-message-highlight {
+    background-color: #ffffff;
+    color:#000;
+    border-radius: 3px;
+    padding: 5px;
+    margin: 5px 0;
 }
