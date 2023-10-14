@@ -1,11 +1,13 @@
 import React from 'react';
+import 'semantic-ui-css/semantic.min.css';
 import { useState } from 'react';
 import './App.css';
 import Canvas from './components/canvas/Canvas'
-import MenuConfiguracion from './components/AddSquare_otroborrar'
+import MenuConfiguracion from './components/MenuCanvas'
 import CanvasContext from './components/context/CanvasContext';
 import { ConsolaProvider} from './components/context/ConsolaContext';
 import ConsolaWrapper from './components/wrapper/ConsolaWrapper';
+
 
 function App() {
   const [canvasVal, setCanvasVal] = useState<fabric.Canvas>();

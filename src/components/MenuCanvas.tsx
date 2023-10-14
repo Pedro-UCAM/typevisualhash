@@ -3,6 +3,7 @@ import React from 'react';
 import CanvasContext from './context/CanvasContext';
 import { fabric } from 'fabric';
 import { useConsola } from './context/ConsolaContext';
+import { Button, Input, Label, Grid, Segment } from 'semantic-ui-react'
 
 const AddSquare = () => {
     const { canvas, setCanvas } = useContext(CanvasContext);
@@ -131,7 +132,7 @@ const AddSquare = () => {
         const arrowBodyWidth = 5;  // Cambiamos el ancho del cuerpo de la flecha
         const arrowBodyHeight = 15;
         const arrowTipSize = 10;  // Cambiamos el tamaño de la punta de la flecha
-    
+
         const arrowBody = new fabric.Rect({
             width: arrowBodyWidth,
             height: arrowBodyHeight,
@@ -139,7 +140,7 @@ const AddSquare = () => {
             originX: 'center',
             originY: 'bottom'
         });
-    
+
         const arrowTip = new fabric.Triangle({
             width: 15,
             height: 10,
@@ -149,17 +150,17 @@ const AddSquare = () => {
             angle: 180,
             top: -5
         });
-    
+
         const arrowGroup = new fabric.Group([arrowBody, arrowTip], {
-            left: (square.left + square.width / 2)-7, //Ajusto la posicion de la flecha para que este centrada con el cuadrado
+            left: (square.left + square.width / 2) - 7, //Ajusto la posicion de la flecha para que este centrada con el cuadrado
             top: square.top - arrowTipSize - arrowBodyHeight,  // Ajustamos la posición de la flecha para que esté justo encima del cuadrado
             selectable: false
         });
-    
+
         // Aplicamos el zoom
         const scaleFactor = 1;  // 
         arrowGroup.scale(scaleFactor);
-    
+
         if (currentArrowGroup && canvas) {
             canvas.remove(currentArrowGroup);
         }
@@ -168,7 +169,7 @@ const AddSquare = () => {
         }
         currentArrowGroup = arrowGroup;
     }
-    
+
 
 
 
@@ -475,85 +476,59 @@ const AddSquare = () => {
     };
 
     return (
-        <div>
-            <div>
-                <input
-                    type="number"
-                    min="0"
-                    max="60"
-                    value={numSquares}
-                    onChange={handleNumSquaresChange}
-                />
-                <button onClick={addSquare}>Tamaño del Array</button>
-            </div>
-
-            {/* <div>
-                <input
-                    type="number"
-                    value={selectedSquareIndex}
-                    onChange={(event) => setSelectedSquareIndex(Number(event.target.value))}
-                />
-                <button onClick={deleteSquare}>Eliminar cuadrado</button>
-            </div> */}
-
-            <div>
-                <input
-                    type="number"
-                    min="0"
-                    max="9999"
-                    value={numero}
-                    onChange={handleNumeroChange}
-                />
-                <button onClick={introducirNumero} disabled={animationRunning}>Insertar número</button>
-                {/* <button onClick={() => setAnimationCancelled(true)} disabled={!animationRunning}>Cancelar animación</button> */}
-                <div style={{ position: 'relative', width: '100%' }}>
-                    <input
-                        type="range"
-                        min="0"
-                        max="3"
-                        step="1"
-                        defaultValue="1"
-                        onChange={handleSliderChange}
-                        style={{ width: '100%' }}
+        <Grid textAlign='center' verticalAlign='middle'>
+            <Grid.Row>
+                <Grid.Column width={3}>
+                    <Button onClick={addSquare}>Tamaño del Array</Button>
+                </Grid.Column>
+                <Grid.Column width={4}>
+                    <Button.Group>
+                        <Button toggle active={collisionAlgorithm === 'linear'} onClick={() => setCollisionAlgorithm('linear')}>Lineal</Button>
+                        <Button toggle active={collisionAlgorithm === 'quadratic'} onClick={() => setCollisionAlgorithm('quadratic')}>Cuadrática</Button>
+                        <Button toggle active={collisionAlgorithm === 'key-dependent'} onClick={() => setCollisionAlgorithm('key-dependent')}>Dependiente de Clave</Button>
+                    </Button.Group>
+                </Grid.Column>
+                <Grid.Column width={3}>
+                    <Input 
+                        type="number" 
+                        min="0" 
+                        max="9999" 
+                        value={numero} 
+                        onChange={handleNumeroChange}
+                        action={<Button onClick={introducirNumero} disabled={animationRunning}>Insertar</Button>}
                     />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
-                        <span style={{ flex: '1', textAlign: 'center' }}>x0.5</span>
-                        <span style={{ flex: '1', textAlign: 'center' }}>x1</span>
-                        <span style={{ flex: '1', textAlign: 'center' }}>x2</span>
-                        <span style={{ flex: '1', textAlign: 'center' }}>x4</span>
+                </Grid.Column>
+                <Grid.Column width={4}>
+                    <div style={{ position: 'relative', width: '100%' }}>
+                        <input 
+                            type="range" 
+                            min="0" 
+                            max="3" 
+                            step="1" 
+                            defaultValue="1" 
+                            onChange={handleSliderChange} 
+                            style={{ width: '100%' }}
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
+                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x0.5</Label>
+                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x1</Label>
+                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x2</Label>
+                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x4</Label>
+                        </div>
                     </div>
-                </div>
-
-            </div>
-
-            <div>
-                <p>Seleccione el algoritmo de manejo de colisiones:</p>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={collisionAlgorithm === 'linear'}
-                        onChange={() => setCollisionAlgorithm('linear')}
-                    />
-                    Lineal
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={collisionAlgorithm === 'quadratic'}
-                        onChange={() => setCollisionAlgorithm('quadratic')}
-                    />
-                    Cuadrática
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={collisionAlgorithm === 'key-dependent'}
-                        onChange={() => setCollisionAlgorithm('key-dependent')}
-                    />
-                    Dependiente de Clave
-                </label>
-            </div>
-        </div>
+                </Grid.Column>
+                <Grid.Column width={2}>
+                    <Segment>OCUPACION Actual</Segment>
+                </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+                <Button.Group>
+                    <Button>30%</Button>
+                    <Button>50%</Button>
+                    <Button>80%</Button>
+                </Button.Group>
+            </Grid.Row>
+        </Grid>
     );
 }
 
