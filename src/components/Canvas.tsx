@@ -9,7 +9,7 @@ const FabricCanvas = () => {
     const canvasInstance = new fabric.Canvas('canvas', {
       height: 500,
       width: 1000,
-      backgroundColor: 'pink',
+      backgroundColor: 'white',
       
     });
     setCanvas(canvasInstance);

@@ -1,38 +1,48 @@
+/* App.css */
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'Arial', sans-serif;
+  height: 100vh;
+}
+
+.header {
+  margin-top: 10px;
+}
+
+.body-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%; /* Puedes ajustar según tus preferencias */
+  margin-top: 20px;
+}
+
+.canvas {
+  flex: 3; /* Esta proporción determina el espacio relativo entre Canvas y Consola */
+  /* background-color: magenta; Color de prueba */
+  height: 550px; /* Puedes ajustar según tus preferencias */
+}
+
+.consola {
+  flex: 2; /* Esta proporción determina el espacio relativo entre Canvas y Consola */
+  /* background-color: black; Color de prueba */
+  height: 400px; /* Puedes ajustar según tus preferencias */
+  color: white; /* Color de texto */
+  padding: 10px;
+}
+
+.menu-configuracion {
+  width: 90%;
+  /* background-color: yellow; Color de prueba */
+  height: 50px; /* Puedes ajustar según tus preferencias */
+  margin-top: 50px;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.footer {
+  margin-top: 20px;
 }
