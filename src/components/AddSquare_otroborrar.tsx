@@ -1,7 +1,8 @@
 import { useContext, useRef, useState } from 'react';
 import React from 'react';
-import CanvasContext from './CanvasContext';
+import CanvasContext from './context/CanvasContext';
 import { fabric } from 'fabric';
+import { useConsola } from './context/ConsolaContext';
 
 const AddSquare = () => {
     const { canvas, setCanvas } = useContext(CanvasContext);
@@ -25,6 +26,7 @@ const AddSquare = () => {
 
     let currentArrowGroup: any = null; // Esta variable mantiene la referencia al grupo de flechas actual en el canvas: any = null; // Esta variable mantiene la referencia a la flecha actual en el canvas
 
+    const { enviarMensaje } = useConsola(); //Funcion para enviar mensajes a la consola
 
     const handleNumSquaresChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const valorIntroducido = Number(event.target.value);
@@ -149,7 +151,7 @@ const AddSquare = () => {
         });
     
         const arrowGroup = new fabric.Group([arrowBody, arrowTip], {
-            left: (square.left + square.width / 2)-7,
+            left: (square.left + square.width / 2)-7, //Ajusto la posicion de la flecha para que este centrada con el cuadrado
             top: square.top - arrowTipSize - arrowBodyHeight,  // Ajustamos la posición de la flecha para que esté justo encima del cuadrado
             selectable: false
         });
@@ -331,8 +333,8 @@ const AddSquare = () => {
         const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
         let nuevaPosicion: number | undefined = posicion;
         console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
+        enviarMensaje(`<nH0> = H(K) = k mod NELEMS> = <n${numero}> mod <n${squares.length}> = <b[${posicion}]>`);
         console.log(`${numero} mod ${squares.length} = ${posicion}`);
-
         // Crea una copia del array original para no modificarlo directamente
         const newArray = [...numArray];
         let i = 0;
@@ -349,6 +351,7 @@ const AddSquare = () => {
                 }
                 // Verifica si la posición ya está ocupada
                 console.log(`Se intenta insertar en ${nuevaPosicion}`);
+                enviarMensaje(`Intento en <b[${nuevaPosicion}]>`);
                 // Animación seleccionar cuadrado
                 const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
                 setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation
@@ -363,14 +366,19 @@ const AddSquare = () => {
                 } else {
                     // Deja un comentario o realiza alguna acción si la posición ya está ocupada
                     console.log(`La posición ${nuevaPosicion} ya está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
+                    enviarMensaje(`<r[${nuevaPosicion}]> ocupado`);
+                    enviarMensaje(`<rSe gestiona la colisión con <n${collisionAlgorithm}`);
                     squareAnimation(square, "fail");
 
                     // Incrementa o inicializa el conteo de intentos para esta posición
                     intentosPrevios[Number(nuevaPosicion)] = (intentosPrevios[Number(nuevaPosicion)] || 0) + 1;
 
                     // Si la posición se ha intentado 3 veces, detén la animación y muestra un error
-                    if (intentosPrevios[Number(nuevaPosicion)] >= 3) {
+                    if (intentosPrevios[Number(nuevaPosicion)] >= 3 && canvas) {
                         console.error(`No se pudo insertar ${numero}. Se detectó un bucle en la posición ${nuevaPosicion}.`);
+                        enviarMensaje(`<rFallo al insertar> <b${numero}> Se detectó un bucle en la posición <r[${nuevaPosicion}]>`);
+                        canvas.remove(currentArrowGroup);
+                        currentArrowGroup = null;
                         return undefined;
                     }
 
@@ -429,10 +437,13 @@ const AddSquare = () => {
             setSquaresLastAnimation([]);
         }
 
+        //Primer mensaje de Consola: consola(Se va a intentar Introducir el numero $numero, numero)
+        enviarMensaje(`<n${numero}:>`, numero);
         const posicion = await calcularPosicion(numero);  // Usa await para esperar el resultado
 
         if (posicion === undefined) {
             console.log(`No se pudo insertar ${numero}`);
+            enviarMensaje(`<rNo se pudo insertar> <n${numero}>`);
         }
         else {
             // console.log(`Entro en el else de introducirNumero`);
@@ -458,6 +469,7 @@ const AddSquare = () => {
                 }
             }
             console.log(`${numero} se insertó en la posición: ${posicion}`, posicion);
+            enviarMensaje(`Insertado en <g[><g${posicion}><g]>`);
         }
         setAnimationRunning(false);
     };

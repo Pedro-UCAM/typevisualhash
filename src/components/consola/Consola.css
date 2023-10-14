@@ -1,0 +1,11 @@
+.tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.console-content {
+    border: 1px solid #000000;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
