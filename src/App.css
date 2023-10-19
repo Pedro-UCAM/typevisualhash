@@ -39,7 +39,7 @@
 .menu-configuracion {
   width: 90%;
   /* background-color: yellow; Color de prueba */
-  height: 50px; /* Puedes ajustar según tus preferencias */
+  height: 150px; /* Puedes ajustar según tus preferencias */
   margin-top: 50px;
   display: flex;
   justify-content: center;
@@ -49,3 +49,38 @@
 .footer {
   margin-top: 20px;
 }
+
+/* ... Tus otros estilos ... */
+
+@media (max-width: 768px) {
+  .body-content {
+      flex-direction: column; /* Apila los elementos verticalmente */
+      align-items: stretch; /* Hace que los hijos se estiren para ocupar el ancho completo */
+  }
+
+  .canvas, .consola {
+      flex: none; /* Se deshace del flex porque no es necesario cuando se apilan verticalmente */
+      width: 100%; /* Ocupa todo el ancho posible */
+      margin-top: 5px; /* Añade un margen superior para separarlos */
+      /* Elimina la altura fija para permitir flexibilidad */
+      height: auto; 
+      min-height: 150px; /* Esto asegura un mínimo de altura pero permite que crezca si es necesario */
+  }
+  .consola {
+    margin-bottom: 60px; /* Añade un margen superior para separarlos */
+}
+  
+  .menu-configuracion {
+      margin-top: 30px; /* Ajusta el margen si es necesario */
+      /* Elimina la altura fija para permitir flexibilidad */
+      height: auto; 
+      min-height: 80px; /* Puedes ajustar este valor si es necesario */
+  }
+}
+
+@media only screen and (max-width: 768px) { /* Umbral para tablets y dispositivos móviles */
+  .menu-configuracion {
+      flex-direction: column; /* Apila elementos verticalmente */
+  }
+}
+

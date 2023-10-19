@@ -25,6 +25,8 @@ const AddSquare = () => {
     //const [delayTime, setDelayTime] = useState(1000); // Comienza con el valor predeterminado de 1 segundo.
     const delayTime = useRef(1000);
 
+    const [value, setValue] = useState(1);
+
     let currentArrowGroup: any = null; // Esta variable mantiene la referencia al grupo de flechas actual en el canvas: any = null; // Esta variable mantiene la referencia a la flecha actual en el canvas
 
     const { enviarMensaje } = useConsola(); //Funcion para enviar mensajes a la consola
@@ -190,16 +192,6 @@ const AddSquare = () => {
             canvas.clear();
             canvas.backgroundColor = '#ffffff'; // Restablece el color de fondo original
             setSquares([]);
-
-
-            // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
-            const numArray = Array(numSquares).fill(undefined);
-            setNumArray(numArray);
-            // Haz lo mismo para el array numerosCanvas
-            const initialNumerosCanvas = Array(numSquares).fill(undefined);
-            setNumerosCanvas(initialNumerosCanvas);
-
-
             // const top = 100;
             // const left = 200;
             const width = 50;
@@ -207,43 +199,61 @@ const AddSquare = () => {
             const fill = 'rgb(178,204,255)';
             const canvasWidth = canvas.width !== undefined ? canvas.width - 100 : 0; //Margen de 100 ancho
             const canvasHeight = canvas.height !== undefined ? canvas.height - 50 : 0; //Margen 50 alto
-            let i = 0;
+            if (canvas.width) {
+                const marginX = canvas.width * 0.1;  // 10% del ancho del canvas
+                const marginY = 50;
 
-            for (let top = 50; top < canvasHeight; top += 100) { //Empiezo en 50 de alto por el margen
-                for (let left = 100; left < canvasWidth; left += 55) { //Empiezo en 100 de ancho por el margen
-                    const square = new fabric.Rect({
-                        left: left,
-                        top: top,
-                        width,
-                        height,
-                        fill: 'white',
-                        stroke: 'black',
-                        strokeWidth: 1,
-                    });
+                // Calcula cuántos cuadrados caben en cada fila basado en el ancho del canvas y el tamaño del cuadrado
+                const squaresPerRow = Math.floor((canvas.width - 2 * marginX) / (width + 5)); // 5 es el espacio entre cuadrados
+                // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
+                const numArray = Array(squaresPerRow).fill(undefined);
+                setNumArray(numArray);
+                // Haz lo mismo para el array numerosCanvas
+                const initialNumerosCanvas = Array(squaresPerRow).fill(undefined);
+                setNumerosCanvas(initialNumerosCanvas);
 
-                    // Añadir el cuadrado al canvas
-                    canvas.add(square);
+                // Esto determinará cuánto se debe incrementar en cada paso del bucle.
+                const incrementX = (canvas.width - 2 * marginX) / squaresPerRow;
+                const incrementY = height + 50; // 50 es espacio adicional para el texto debajo del cuadrado
 
-                    // Crear objeto de texto para el índice
-                    const indexText = new fabric.Text(i.toString(), {
-                        left: left + width / 2, // Centrar horizontalmente respecto al cuadrado
-                        top: top + height + 5,  // Colocar debajo del cuadrado con un pequeño margen
-                        fontSize: 12,
-                        originX: 'center', // Esto asegura que el texto se centre en su posición
-                        originY: 'top'
-                    });
+                let i = 0;
 
-                    // Añadir el texto al canvas
-                    canvas.add(indexText);
+                for (let top = marginY; top < canvasHeight; top += incrementY) {
+                    for (let left = marginX; left < canvasWidth; left += incrementX) {
+                        const square = new fabric.Rect({
+                            left: left,
+                            top: top,
+                            width,
+                            height,
+                            fill: 'white',
+                            stroke: 'black',
+                            strokeWidth: 1,
+                        });
 
-                    setSquares((prevSquares) => [...prevSquares, square]);
-                    i++;
+                        // Añadir el cuadrado al canvas
+                        canvas.add(square);
+
+                        // Crear objeto de texto para el índice
+                        const indexText = new fabric.Text(i.toString(), {
+                            left: left + width / 2, // Centrar horizontalmente respecto al cuadrado
+                            top: top + height + 5,  // Colocar debajo del cuadrado con un pequeño margen
+                            fontSize: 12,
+                            originX: 'center', // Esto asegura que el texto se centre en su posición
+                            originY: 'top'
+                        });
+
+                        // Añadir el texto al canvas
+                        canvas.add(indexText);
+
+                        setSquares((prevSquares) => [...prevSquares, square]);
+                        i++;
+                        if (i == numSquares) {
+                            break;
+                        }
+                    }
                     if (i == numSquares) {
                         break;
                     }
-                }
-                if (i == numSquares) {
-                    break;
                 }
             }
             canvas.renderAll();
@@ -488,65 +498,86 @@ const AddSquare = () => {
     };
 
     return (
-        <Grid textAlign='center' verticalAlign='middle'>
-            <Grid.Row>
-                <Grid.Column width={3}>
-                    <Input
-                        type="number"
-                        min="0"
-                        max="60"
-                        value={numSquares}
-                        onChange={handleNumSquaresChange}
-                        placeholder="Tamaño"
-                    />
-                    <Button onClick={addSquare}>Tamaño del Array</Button>
+        <Grid textAlign='center' verticalAlign='middle' stackable> {/* Añade la propiedad "stackable" */}
+            <Grid.Row columns={2}> {/* Todos los elementos ocuparán toda la fila en móviles */}
+                <Grid.Column style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                    {/* Label general para ambas funcionalidades */}
+                    <Label basic size="medium" style={{ display: 'block', textAlign: 'center', marginBottom: '5px' }}>
+                        1º Tamaño e Insertar
+                    </Label>
+
+                    {/* Contenedor para los botones */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ flex: 1 }}>
+                            <Input
+                                type="number"
+                                min="0"
+                                max="60"
+                                value={numSquares}
+                                onChange={handleNumSquaresChange}
+                                placeholder="Tamaño"
+                            />
+                            <Button onClick={addSquare} style={{ marginTop: '5px' }}>Tamaño del Array</Button>
+                        </div>
+
+                        <div style={{ flex: 1 }}>
+                            <Input
+                                type="number"
+                                min="0"
+                                max="9999"
+                                value={numero}
+                                onChange={handleNumeroChange}
+                                action={<Button onClick={introducirNumero} disabled={animationRunning} style={{ marginTop: '5px' }}>Insertar</Button>}
+                            />
+                        </div>
+                    </div>
                 </Grid.Column>
-                <Grid.Column width={4}>
-                    <Button.Group>
+                <Grid.Column>
+                    <Label basic size="medium" style={{ display: 'block', textAlign: 'center', marginBottom: '5px' }}>
+                        2º Algoritmo de Colisión
+                    </Label>
+                    <Button.Group fluid>
                         <Button toggle active={collisionAlgorithm === 'linear'} onClick={() => setCollisionAlgorithm('linear')}>Lineal</Button>
                         <Button toggle active={collisionAlgorithm === 'quadratic'} onClick={() => setCollisionAlgorithm('quadratic')}>Cuadrática</Button>
                         <Button toggle active={collisionAlgorithm === 'key-dependent'} onClick={() => setCollisionAlgorithm('key-dependent')}>Dependiente de Clave</Button>
                     </Button.Group>
                 </Grid.Column>
-                <Grid.Column width={3}>
-                    <Input
-                        type="number"
-                        min="0"
-                        max="9999"
-                        value={numero}
-                        onChange={handleNumeroChange}
-                        action={<Button onClick={introducirNumero} disabled={animationRunning}>Insertar</Button>}
-                    />
-                </Grid.Column>
-                <Grid.Column width={4}>
-                    <div style={{ position: 'relative', width: '100%' }}>
-                        <input
-                            type="range"
-                            min="0"
-                            max="3"
-                            step="1"
-                            defaultValue="1"
-                            onChange={handleSliderChange}
-                            style={{ width: '100%' }}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
-                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x0.5</Label>
-                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x1</Label>
-                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x2</Label>
-                            <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x4</Label>
+
+                <Grid.Column>
+                    <div style={{ marginTop: '20px' }}> {/* Margen ajustado */}
+                        <Label basic size="medium" style={{ display: 'block', textAlign: 'center', marginBottom: '5px' }}>
+                            3º Velocidad de la animación
+                        </Label>
+                        <div style={{ position: 'relative', width: '100%' }}>
+                            <input
+                                type="range"
+                                min="0"
+                                max="3"
+                                step="1"
+                                defaultValue="1"
+                                onChange={handleSliderChange}
+                                style={{ width: '100%' }}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
+                                <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x0.5</Label>
+                                <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x1</Label>
+                                <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x2</Label>
+                                <Label basic size="small" style={{ flex: '1', textAlign: 'center' }}>x4</Label>
+                            </div>
                         </div>
                     </div>
                 </Grid.Column>
-                <Grid.Column width={2}>
-                    <Segment>OCUPACION Actual</Segment>
-                </Grid.Column>
+
+
             </Grid.Row>
-            <Grid.Row>
-                <Button.Group>
-                    <Button>30%</Button>
-                    <Button>50%</Button>
-                    <Button>80%</Button>
-                </Button.Group>
+            <Grid.Row columns={1}>
+                <Grid.Column>
+                    <Button.Group fluid>
+                        <Button>30%</Button>
+                        <Button>50%</Button>
+                        <Button>80%</Button>
+                    </Button.Group>
+                </Grid.Column>
             </Grid.Row>
         </Grid>
     );

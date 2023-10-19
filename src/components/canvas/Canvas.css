@@ -4,6 +4,7 @@
     margin-top: 20px; /* Espacio arriba para separarlo de otros componentes, si es necesario */
     overflow: hidden; /* En caso de que el canvas exceda los límites por alguna razón, recortamos el contenido */
     background-color: #ffffff; /* Fondo verde oscuro */
+    max-width: 100%;
 }
 
 #canvas {

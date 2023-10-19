@@ -5,15 +5,32 @@ import './Canvas.css';  // Importando los estilos que vamos a crear
 
 const FabricCanvas = () => {
     const { setCanvas } = useContext(CanvasContext);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     useEffect(() => {
-        const canvasInstance = new fabric.Canvas('canvas', {
-            height: 500,
-            width: 1000,
-            backgroundColor: '#ffffff', // Cambiando a un fondo verde oscuro
-        });
-        setCanvas(canvasInstance);
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
+
+    useEffect(() => {
+        const canvasWidth = windowWidth < 1000 ? windowWidth * 0.8 : 1000;
+        const canvasHeight = 500 * (canvasWidth / 1000); // mantener la relación de aspecto
+
+        const canvasInstance = new fabric.Canvas('canvas', {
+            height: canvasHeight,
+            width: canvasWidth,
+            backgroundColor: '#ffffff',
+        });
+
+        setCanvas(canvasInstance);
+    }, [windowWidth]);
 
     return (
         <div className="canvas-wrapper">
