@@ -6,6 +6,7 @@ import { useConsola } from './context/ConsolaContext';
 import { Button, Input, Label, Grid, Segment } from 'semantic-ui-react'
 
 const AddSquare = () => {
+    ///Variables de Estado
     const { canvas, setCanvas } = useContext(CanvasContext);
     const [numSquares, setNumSquares] = useState<number>(0); //Tamaño de la Tabla Hash
     const [numerosCanvas, setNumerosCanvas] = useState<fabric.Text[]>([]); //Array de Numeros Canvas
@@ -129,6 +130,10 @@ const AddSquare = () => {
     };
 
     function moveArrow(square: any): void {
+        if (!square || !square.left || !square.width) {
+            console.error("Objeto 'square' no es válido:", square);
+            return; // No continuar si 'square' no es válido
+        }
         const arrowBodyWidth = 5;  // Cambiamos el ancho del cuerpo de la flecha
         const arrowBodyHeight = 15;
         const arrowTipSize = 10;  // Cambiamos el tamaño de la punta de la flecha
@@ -205,13 +210,6 @@ const AddSquare = () => {
 
                 // Calcula cuántos cuadrados caben en cada fila basado en el ancho del canvas y el tamaño del cuadrado
                 const squaresPerRow = Math.floor((canvas.width - 2 * marginX) / (width + 5)); // 5 es el espacio entre cuadrados
-                // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
-                const numArray = Array(squaresPerRow).fill(undefined);
-                setNumArray(numArray);
-                // Haz lo mismo para el array numerosCanvas
-                const initialNumerosCanvas = Array(squaresPerRow).fill(undefined);
-                setNumerosCanvas(initialNumerosCanvas);
-
                 // Esto determinará cuánto se debe incrementar en cada paso del bucle.
                 const incrementX = (canvas.width - 2 * marginX) / squaresPerRow;
                 const incrementY = height + 50; // 50 es espacio adicional para el texto debajo del cuadrado
@@ -255,6 +253,12 @@ const AddSquare = () => {
                         break;
                     }
                 }
+                // Crea un array de números del mismo tamaño que el número de cuadrados y lo rellena con undefined.
+                const numArray = Array(i).fill(undefined);
+                setNumArray(numArray);
+                // Haz lo mismo para el array numerosCanvas
+                const initialNumerosCanvas = Array(i).fill(undefined);
+                setNumerosCanvas(initialNumerosCanvas);
             }
             canvas.renderAll();
         }
@@ -327,12 +331,22 @@ const AddSquare = () => {
                 // Colisión:h= G( k,i ) = (H(k) + d · i ) mod NELEMS i= [0..NELEMS]
                 //d = max (1, k div NELEMS)
                 enviarMensaje(`Gestionando Colisión con <nPrueba Dependiente de Clave>`);
-                const d = Math.max(1, Math.floor(numero / array.length));
+                // Verificar si el tamaño del array es potencia de 2
+                const isPowerOf2 = (array.length & (array.length - 1)) === 0;
+
+                // Calcular d
+                let d = Math.max(1, Math.floor(numero / array.length));
+
+                // Si el tamaño del array es potencia de 2 y d es par, le sumamos 1 a d
+                if (isPowerOf2 && d % 2 === 0) {
+                    d += 1;
+                }
+                // Calcular la nueva posición
                 nuevaPosicion = (posicion + (d * i)) % array.length;
                 enviarMensaje(`<nRecalculando posición:> h = G( k,i ) = (H(k) + d · i ) mod NELEMS`);
                 enviarMensaje(`Calculando clave: d = max (1, k div NELEMS)`);
                 enviarMensaje(`<nmax (${numero}/${array.length})> = <n[${d}]>`);
-                enviarMensaje(`<n${posicion} + (${d} * ${i}> mod <n${array.length}> = <b[${nuevaPosicion}]>`);
+                enviarMensaje(`<n${posicion} + (${d} * ${i})> mod <n${array.length}> = <b[${nuevaPosicion}]>`);
                 break;
 
             default:
@@ -355,11 +369,12 @@ const AddSquare = () => {
     async function calcularPosicion(numero: number): Promise<number | undefined> {
         const posicion = numero % squares.length; // Calcula la posición utilizando el módulo
         let nuevaPosicion: number | undefined = posicion;
-        console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
+        //console.log(`Posición Inicial: h0 = H(K) = k mod NELEMS`);
         enviarMensaje(`<nH0> = H(K) = k mod NELEMS> = <n${numero}> mod <n${squares.length}> = <b[${posicion}]>`);
-        console.log(`${numero} mod ${squares.length} = ${posicion}`);
+        //console.log(`${numero} mod ${squares.length} = ${posicion}`);
         // Crea una copia del array original para no modificarlo directamente
         const newArray = [...numArray];
+        console.log(newArray.length);
         let i = 0;
         let insertado = false;
         const intentosPrevios: { [key: number]: number } = [];
@@ -373,7 +388,7 @@ const AddSquare = () => {
                     return; // Sale de la función
                 }
                 // Verifica si la posición ya está ocupada
-                console.log(`Se intenta insertar en ${nuevaPosicion}`);
+                //console.log(`Se intenta insertar en ${nuevaPosicion}`);
                 enviarMensaje(`<bInsertando> en la posición <b[${nuevaPosicion}]>`);
                 // Animación seleccionar cuadrado
                 const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
@@ -388,7 +403,7 @@ const AddSquare = () => {
                     insertado = true;
                 } else {
                     // Deja un comentario o realiza alguna acción si la posición ya está ocupada
-                    console.log(`La posición ${nuevaPosicion} está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
+                    //console.log(`La posición ${nuevaPosicion} está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
                     enviarMensaje(`<r[${nuevaPosicion}]> está ocupado`);
                     squareAnimation(square, "fail");
 
@@ -407,6 +422,8 @@ const AddSquare = () => {
                     // Llama a la función handleCollision para calcular la nueva posición
                     i++;
                     //enviarMensaje(`Se gestiona la colisión con <n${collisionAlgorithm}>`);
+                    console.log('Voy al handle');
+                    console.log(newArray.length);
                     nuevaPosicion = handleCollision(i, numero, posicion, newArray, collisionAlgorithm);
                 }
 
@@ -447,8 +464,13 @@ const AddSquare = () => {
 
     const introducirNumero = async () => {
 
-        setAnimationRunning(true);
+        // Verificación de las condiciones
+        if (numSquares === 0 || numSquares === undefined || numArray.length === 0) {
+            alert("Primero hay que insertar el tamaño del Array");
+            return;  // Termina la función para no seguir con el resto del código
+        }
 
+        setAnimationRunning(true);
         //Reseteo la animacion anterior
         if (squaresLastAnimation.length > 0) {
             // Recorre cada cuadrado en squaresLastAnimation y llama a la función squareAnimation con "reset"
@@ -465,11 +487,11 @@ const AddSquare = () => {
         const posicion = await calcularPosicion(numero);  // Usa await para esperar el resultado
 
         if (posicion === undefined) {
-            console.log(`No se pudo insertar ${numero}`);
+            //console.log(`No se pudo insertar ${numero}`);
             enviarMensaje(`<rNo se pudo insertar> <n${numero}>`);
         }
         else {
-            // console.log(`Entro en el else de introducirNumero`);
+            ////console.log(`Entro en el else de introducirNumero`);
             // Ahora vamos a introducir el número dentro del cuadrado
             const updatedSelectedSquareIndex = Number(posicion);
             //console.log(`ID del cuadrado: ${updatedSelectedSquareIndex}`);
@@ -491,7 +513,7 @@ const AddSquare = () => {
                     }
                 }
             }
-            console.log(`${numero} se insertó en la posición: ${posicion}`, posicion);
+            //console.log(`${numero} se insertó en la posición: ${posicion}`, posicion);
             enviarMensaje(`Insertado en <g[><g${posicion}><g]>`);
         }
         setAnimationRunning(false);
@@ -517,7 +539,7 @@ const AddSquare = () => {
                                 onChange={handleNumSquaresChange}
                                 placeholder="Tamaño"
                             />
-                            <Button onClick={addSquare} style={{ marginTop: '5px' }}>Tamaño del Array</Button>
+                            <Button onClick={addSquare} disabled={animationRunning} style={{ marginTop: '5px' }}>Tamaño del Array</Button>
                         </div>
 
                         <div style={{ flex: 1 }}>
@@ -537,16 +559,16 @@ const AddSquare = () => {
                         2º Algoritmo de Colisión
                     </Label>
                     <Button.Group fluid>
-                        <Button toggle active={collisionAlgorithm === 'linear'} onClick={() => setCollisionAlgorithm('linear')}>Lineal</Button>
-                        <Button toggle active={collisionAlgorithm === 'quadratic'} onClick={() => setCollisionAlgorithm('quadratic')}>Cuadrática</Button>
-                        <Button toggle active={collisionAlgorithm === 'key-dependent'} onClick={() => setCollisionAlgorithm('key-dependent')}>Dependiente de Clave</Button>
+                        <Button toggle disabled={animationRunning} active={collisionAlgorithm === 'linear'} onClick={() => setCollisionAlgorithm('linear')}>Lineal</Button>
+                        <Button toggle disabled={animationRunning} active={collisionAlgorithm === 'quadratic'} onClick={() => setCollisionAlgorithm('quadratic')}>Cuadrática</Button>
+                        <Button toggle disabled={animationRunning} active={collisionAlgorithm === 'key-dependent'} onClick={() => setCollisionAlgorithm('key-dependent')}>Dependiente de Clave</Button>
                     </Button.Group>
                 </Grid.Column>
 
                 <Grid.Column>
                     <div style={{ marginTop: '20px' }}> {/* Margen ajustado */}
                         <Label basic size="medium" style={{ display: 'block', textAlign: 'center', marginBottom: '5px' }}>
-                            3º Velocidad de la animación
+                            Velocidad de la animación
                         </Label>
                         <div style={{ position: 'relative', width: '100%' }}>
                             <input

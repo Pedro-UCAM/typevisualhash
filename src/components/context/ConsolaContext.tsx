@@ -15,7 +15,7 @@ export const ConsolaProvider: React.FC<React.PropsWithChildren<{}>> = ({ childre
     const enviarMensaje = (mensaje: string, numero?: number) => {
         setMensajes(prev => {
             const nuevosMensajes = [...prev, { mensaje, numero }];
-            console.log("Mensajes actuales:", nuevosMensajes);
+            //console.log("Mensajes actuales:", nuevosMensajes);
             return nuevosMensajes;
         });
     }
