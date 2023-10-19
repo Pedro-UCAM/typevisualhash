@@ -98,7 +98,6 @@ const AddSquare = () => {
             let strokeColor = 'black'; // Color por defecto
             let strokeWidth = 3;
             //let fillColor = 'white'; // Color por defecto
-
             switch (animationType) {
                 case 'select':
                     strokeColor = '#6EC4DB';
@@ -118,7 +117,6 @@ const AddSquare = () => {
                     console.error('Tipo de animación no reconocida:', animationType);
                     return; // Salir de la función si el tipo de animación no es reconocido
             }
-
             squareObj.set({
                 strokeWidth: strokeWidth,
                 stroke: strokeColor
@@ -295,7 +293,10 @@ const AddSquare = () => {
                 // Colisión: h= G(k,i) = (H(k) + i) mod NELEMS i= [0..NELEMS]
 
                 // Calcula la nueva posición utilizando el algoritmo de prueba lineal
+                enviarMensaje(`Gestionando Colisión con <nPrueba Lineal>`);
                 nuevaPosicion = (posicion + i) % array.length;
+                enviarMensaje(`<nRecalculando posición:> h = G(k,i) = (H(k) + i) mod NELEMS`);
+                enviarMensaje(`<n${posicion} + ${i}> mod <n${array.length}> = <b[${nuevaPosicion}]>`);
                 break;
 
             case 'quadratic':
@@ -303,14 +304,25 @@ const AddSquare = () => {
                 // Puedes calcular la nueva posición cuadráticamente aquí
                 // Sin colisión: h0 = H(k) = k mod NELEMS
                 // Colisión: h= G(k,i) = (H(k) + (i*i)) mod NELEMS i= [0..NELEMS]
+                enviarMensaje(`Gestionando Colisión con <nPrueba Cuadrática>`);
                 nuevaPosicion = (posicion + (i * i)) % array.length;
+                enviarMensaje(`<nRecalculando posición:> h = G(k,i) = (H(k) + (i*i)) mod NELEMS`);
+                enviarMensaje(`<n${posicion} + (${i} * ${i}> mod <n${array.length}> = <b[${nuevaPosicion}]>`);
                 break;
 
             case 'key-dependent':
                 // Algoritmo de colisión dependiente de clave
                 // Calcula el valor de d basado en la clave (numero)
+                //Sin colisión: h 0 = H(k) = k mod NELEMS
+                // Colisión:h= G( k,i ) = (H(k) + d · i ) mod NELEMS i= [0..NELEMS]
+                //d = max (1, k div NELEMS)
+                enviarMensaje(`Gestionando Colisión con <nPrueba Dependiente de Clave>`);
                 const d = Math.max(1, Math.floor(numero / array.length));
                 nuevaPosicion = (posicion + (d * i)) % array.length;
+                enviarMensaje(`<nRecalculando posición:> h = G( k,i ) = (H(k) + d · i ) mod NELEMS`);
+                enviarMensaje(`Calculando clave: d = max (1, k div NELEMS)`);
+                enviarMensaje(`<nmax (${numero}/${array.length})> = <n[${d}]>`);
+                enviarMensaje(`<n${posicion} + (${d} * ${i}> mod <n${array.length}> = <b[${nuevaPosicion}]>`);
                 break;
 
             default:
@@ -352,7 +364,7 @@ const AddSquare = () => {
                 }
                 // Verifica si la posición ya está ocupada
                 console.log(`Se intenta insertar en ${nuevaPosicion}`);
-                enviarMensaje(`Se <bintenta> insertar en la posición <b[${nuevaPosicion}]>`);
+                enviarMensaje(`<bInsertando> en la posición <b[${nuevaPosicion}]>`);
                 // Animación seleccionar cuadrado
                 const square = squares[Number(nuevaPosicion)]; // Selecciono el cuadrado
                 setSquaresLastAnimation(prevSquares => [...prevSquares, square]); //Añado a la lista LastAnimation
@@ -366,9 +378,8 @@ const AddSquare = () => {
                     insertado = true;
                 } else {
                     // Deja un comentario o realiza alguna acción si la posición ya está ocupada
-                    console.log(`La posición ${nuevaPosicion} ya está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
-                    enviarMensaje(`<r[${nuevaPosicion}]> ocupado`);
-                    enviarMensaje(`<rSe gestiona la colisión con <n${collisionAlgorithm}`);
+                    console.log(`La posición ${nuevaPosicion} está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
+                    enviarMensaje(`<r[${nuevaPosicion}]> está ocupado`);
                     squareAnimation(square, "fail");
 
                     // Incrementa o inicializa el conteo de intentos para esta posición
@@ -385,6 +396,7 @@ const AddSquare = () => {
 
                     // Llama a la función handleCollision para calcular la nueva posición
                     i++;
+                    //enviarMensaje(`Se gestiona la colisión con <n${collisionAlgorithm}>`);
                     nuevaPosicion = handleCollision(i, numero, posicion, newArray, collisionAlgorithm);
                 }
 
@@ -479,6 +491,14 @@ const AddSquare = () => {
         <Grid textAlign='center' verticalAlign='middle'>
             <Grid.Row>
                 <Grid.Column width={3}>
+                    <Input
+                        type="number"
+                        min="0"
+                        max="60"
+                        value={numSquares}
+                        onChange={handleNumSquaresChange}
+                        placeholder="Tamaño"
+                    />
                     <Button onClick={addSquare}>Tamaño del Array</Button>
                 </Grid.Column>
                 <Grid.Column width={4}>
@@ -489,24 +509,24 @@ const AddSquare = () => {
                     </Button.Group>
                 </Grid.Column>
                 <Grid.Column width={3}>
-                    <Input 
-                        type="number" 
-                        min="0" 
-                        max="9999" 
-                        value={numero} 
+                    <Input
+                        type="number"
+                        min="0"
+                        max="9999"
+                        value={numero}
                         onChange={handleNumeroChange}
                         action={<Button onClick={introducirNumero} disabled={animationRunning}>Insertar</Button>}
                     />
                 </Grid.Column>
                 <Grid.Column width={4}>
                     <div style={{ position: 'relative', width: '100%' }}>
-                        <input 
-                            type="range" 
-                            min="0" 
-                            max="3" 
-                            step="1" 
-                            defaultValue="1" 
-                            onChange={handleSliderChange} 
+                        <input
+                            type="range"
+                            min="0"
+                            max="3"
+                            step="1"
+                            defaultValue="1"
+                            onChange={handleSliderChange}
                             style={{ width: '100%' }}
                         />
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
