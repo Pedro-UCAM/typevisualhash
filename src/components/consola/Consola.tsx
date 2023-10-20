@@ -18,13 +18,12 @@ const Consola: React.FC<ConsolaProps> = (props) => {
         }
     }, [props.mensajes]);
 
-    // Las reglas de transformación
+    // Las reglas de transformación <n> Negrita, <b> Blue, <r> Red, <g> Green
     const rules = [
         { regex: /<n(.*?)>/g, replacement: '<strong>$1</strong>' },
         { regex: /<b(.*?)>/g, replacement: '<strong><span style="color: #6EC4DB; font-weight: bold;">$1</span></strong>' },
         { regex: /<r(.*?)>/g, replacement: '<strong><span style="color: #FA7C92; font-weight: bold;">$1</span></strong>' },
         { regex: /<g(.*?)>/g, replacement: '<strong><span style="color: #66AB8C; font-weight: bold;">$1</span></strong>' },
-        // Puedes añadir más reglas aquí en el futuro
     ];
 
     const transformMessage = (message: string) => {

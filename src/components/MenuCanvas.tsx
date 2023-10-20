@@ -336,16 +336,15 @@ const AddSquare = () => {
 
                 // Calcular d
                 let d = Math.max(1, Math.floor(numero / array.length));
-
+                enviarMensaje(`<nRecalculando posición:> h = G( k,i ) = (H(k) + d · i ) mod NELEMS`);
+                enviarMensaje(`Calculando clave: d = max (1, k div NELEMS): <nmax (${numero}/${array.length})> = <n${d}>`);
                 // Si el tamaño del array es potencia de 2 y d es par, le sumamos 1 a d
                 if (isPowerOf2 && d % 2 === 0) {
+                    enviarMensaje(`Como el Array [${array.length}] es potencia de 2 y d par: <n${d} + 1>`);
                     d += 1;
                 }
                 // Calcular la nueva posición
                 nuevaPosicion = (posicion + (d * i)) % array.length;
-                enviarMensaje(`<nRecalculando posición:> h = G( k,i ) = (H(k) + d · i ) mod NELEMS`);
-                enviarMensaje(`Calculando clave: d = max (1, k div NELEMS)`);
-                enviarMensaje(`<nmax (${numero}/${array.length})> = <n[${d}]>`);
                 enviarMensaje(`<n${posicion} + (${d} * ${i})> mod <n${array.length}> = <b[${nuevaPosicion}]>`);
                 break;
 
@@ -592,7 +591,7 @@ const AddSquare = () => {
 
 
             </Grid.Row>
-            <Grid.Row columns={1}>
+            {/* <Grid.Row columns={1}>
                 <Grid.Column>
                     <Button.Group fluid>
                         <Button>30%</Button>
@@ -600,7 +599,7 @@ const AddSquare = () => {
                         <Button>80%</Button>
                     </Button.Group>
                 </Grid.Column>
-            </Grid.Row>
+            </Grid.Row> */}
         </Grid>
     );
 }
