@@ -208,8 +208,14 @@ const AddSquare = () => {
   const addSquare = () => {
     if (canvas) {
       clearConsola(); // Esto limpiará la consola y reiniciará el índice.
+
       canvas.clear();
-      canvas.backgroundColor = "#ffffff"; // Restablece el color de fondo original
+
+      // Restablece las propiedades del canvas después de limpiarlo
+      canvas.backgroundColor = "#ffffff";
+      canvas.selection = false;
+      canvas.hoverCursor = "default";
+
       setSquares([]);
       // const top = 100;
       // const left = 200;
@@ -245,6 +251,7 @@ const AddSquare = () => {
               lockMovementX: true,
               lockMovementY: true,
               lockRotation: true,
+              hasControls: false, // Desactiva controles de tamaño y rotación
             });
 
             // Añadir el cuadrado al canvas
