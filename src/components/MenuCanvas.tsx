@@ -147,6 +147,10 @@ const AddSquare = () => {
       fill: "#6EC4DB",
       originX: "center",
       originY: "bottom",
+      lockMovementX: true,
+      lockMovementY: true,
+      hasControls: false, // Desactiva controles de tamaño y rotación
+      lockRotation: true,
     });
 
     const arrowTip = new fabric.Triangle({
@@ -157,6 +161,10 @@ const AddSquare = () => {
       originY: "bottom", // Cambiamos 'top' a 'bottom' para que el triángulo se sitúe en la parte inferior
       angle: 180,
       top: -5,
+      lockMovementX: true,
+      lockMovementY: true,
+      hasControls: false, // Desactiva controles de tamaño y rotación
+      lockRotation: true,
     });
 
     const arrowGroup = new fabric.Group([arrowBody, arrowTip], {
@@ -234,6 +242,9 @@ const AddSquare = () => {
               fill: "white",
               stroke: "black",
               strokeWidth: 1,
+              lockMovementX: true,
+              lockMovementY: true,
+              lockRotation: true,
             });
 
             // Añadir el cuadrado al canvas
@@ -246,6 +257,10 @@ const AddSquare = () => {
               fontSize: 12,
               originX: "center", // Esto asegura que el texto se centre en su posición
               originY: "top",
+              lockMovementX: true,
+              lockMovementY: true,
+              hasControls: false, // Desactiva controles de tamaño y rotación
+              lockRotation: true,
             });
 
             // Añadir el texto al canvas
@@ -301,6 +316,10 @@ const AddSquare = () => {
         fill: "black", // Color del texto (negro)
         originX: "center", // Establece el punto de origen en el centro horizontal
         originY: "center",
+        lockMovementX: true,
+        lockMovementY: true,
+        hasControls: false, // Desactiva controles de tamaño y rotación
+        lockRotation: true,
         // Establece el punto de origen en el centro vertical
       });
 
