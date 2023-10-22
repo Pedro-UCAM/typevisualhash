@@ -32,7 +32,9 @@ const AddSquare = () => {
 
   let currentArrowGroup: any = null; // Esta variable mantiene la referencia al grupo de flechas actual en el canvas: any = null; // Esta variable mantiene la referencia a la flecha actual en el canvas
 
+  //COnsola
   const { enviarMensaje } = useConsola(); //Funcion para enviar mensajes a la consola
+  const { clearConsola } = useConsola(); //Funcion para resetear consola
 
   const handleNumSquaresChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -197,6 +199,7 @@ const AddSquare = () => {
   //FUNCION PARA LLENAR EL CANVAS SEGUN EL TAMAÑO QUE INDIQUE EL USUARIO
   const addSquare = () => {
     if (canvas) {
+      clearConsola(); // Esto limpiará la consola y reiniciará el índice.
       canvas.clear();
       canvas.backgroundColor = "#ffffff"; // Restablece el color de fondo original
       setSquares([]);
@@ -607,6 +610,7 @@ const AddSquare = () => {
   ///FILL 30% 50% 80%
   // Función para limpiar el canvas y reiniciar los estados
   function resetCanvasAndStates() {
+    clearConsola(); // Esto limpiará la consola y reiniciará el índice.
     // Eliminar todos los números de Fabric.js del canvas
     if (canvas) {
       numerosCanvas.forEach((numeroCanvas) => {

@@ -5,6 +5,7 @@ import Consola from "../consola/Consola";
 interface ConsolaContextType {
   mensajes: { mensaje: string; numero?: number }[];
   enviarMensaje: (mensaje: string, numero?: number) => void;
+  clearConsola: () => void;
 }
 
 const ConsolaContext = createContext<ConsolaContextType | undefined>(undefined);
@@ -44,10 +45,15 @@ export const ConsolaProvider: React.FC<React.PropsWithChildren<{}>> = ({
     });
   };
 
+  const clearConsola = () => {
+    setMensajes([]); // Limpiar la lista de mensajes.
+    setCurrentIndex(0); // Reiniciar el índice.
+    setLastNumero(null); // Reiniciar el último número.
+  };
+
   return (
-    <ConsolaContext.Provider value={{ mensajes, enviarMensaje }}>
+    <ConsolaContext.Provider value={{ mensajes, enviarMensaje, clearConsola }}>
       {children}
-      {/* <Consola mensajes={mensajes} /> */}
     </ConsolaContext.Provider>
   );
 };
