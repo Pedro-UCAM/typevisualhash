@@ -4,16 +4,15 @@
   flex-direction: column;
   align-items: center;
   font-family: 'Arial', sans-serif;
-  height: 100vh;
-  /* Cambia el color de fondo a tu elección */
-  background-color: #ecececf0; /* Cambia #ff0000 al código de color que desees */
+  min-height: 100vh; /* Se cambia de 'height' a 'min-height' para asegurar que el contenido se expanda según sea necesario */
+  background-color: #ecececf0; 
 }
 .body-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 90%; /* Puedes ajustar según tus preferencias */
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 .canvas {
@@ -41,12 +40,14 @@
 }
 
 .footer {
-  margin-top: 50px;
+  flex-shrink: 0; /* Evita que el footer se encoja */
+  margin-top: 60px;
+  width: 100%; /* Asegura que el footer ocupe todo el espacio horizontalmente */
 }
 
 /* header */
 .header-segment {
-  background-color: #1b1c1d; /* Color de fondo oscuro predeterminado de Semantic UI */
+  background-color: #ecececf0; /* Color de fondo oscuro predeterminado de Semantic UI */
   width: 100%; /* Ocupa todo el espacio horizontal disponible */
   padding: 15px 0; /* Espaciado vertical para darle algo de altura */
   margin: 0; /* Eliminar cualquier margen predeterminado */
@@ -71,12 +72,14 @@
   .body-content {
       flex-direction: column; /* Apila los elementos verticalmente */
       align-items: stretch; /* Hace que los hijos se estiren para ocupar el ancho completo */
+      margin-bottom: -100px;
+      margin-top: -15px;
   }
 
   .canvas, .consola {
       flex: none; /* Se deshace del flex porque no es necesario cuando se apilan verticalmente */
       width: 100%; /* Ocupa todo el ancho posible */
-      margin-top: 5px; /* Añade un margen superior para separarlos */
+      margin-top: 0px; /* Añade un margen superior para separarlos */
       /* Elimina la altura fija para permitir flexibilidad */
       height: auto; 
       min-height: 150px; /* Esto asegura un mínimo de altura pero permite que crezca si es necesario */
@@ -86,10 +89,13 @@
 }
   
   .menu-configuracion {
-      margin-top: 30px; /* Ajusta el margen si es necesario */
+      margin-top: 0px; /* Ajusta el margen si es necesario */
       /* Elimina la altura fija para permitir flexibilidad */
       height: auto; 
       min-height: 80px; /* Puedes ajustar este valor si es necesario */
+  }
+  .footer {
+    margin-top: 0px;
   }
 }
 
