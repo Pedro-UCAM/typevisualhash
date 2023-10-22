@@ -349,7 +349,7 @@ const AddSquare = () => {
           `<nRecalculando posición:> h = G(k,i) = (H(k) + (i*i)) mod NELEMS`
         );
         enviarMensaje(
-          `<n${posicion} + (${i} * ${i}> mod <n${array.length}> = <b[${nuevaPosicion}]>`
+          `<n${posicion} + (${i} * ${i})> mod <n${array.length}> = <b[${nuevaPosicion}]>`
         );
         break;
 
@@ -371,7 +371,7 @@ const AddSquare = () => {
           `<nRecalculando posición:> h = G( k,i ) = (H(k) + d · i ) mod NELEMS`
         );
         enviarMensaje(
-          `Calculando clave: d = max (1, k div NELEMS): <nmax (${numero}/${array.length})> = <n${d}>`
+          `<nCalculando clave:> d = max (1, k div NELEMS): <nmax (${numero}/${array.length})> = <n${d}>`
         );
         // Si el tamaño del array es potencia de 2 y d es par, le sumamos 1 a d
         if (isPowerOf2 && d % 2 === 0) {
@@ -445,7 +445,7 @@ const AddSquare = () => {
         } else {
           // Deja un comentario o realiza alguna acción si la posición ya está ocupada
           //console.log(`La posición ${nuevaPosicion} está ocupada. Se gestiona la colisión con ${collisionAlgorithm}`);
-          enviarMensaje(`<r[${nuevaPosicion}]> está ocupado`);
+          enviarMensaje(`<rPosición [${nuevaPosicion}] ocupada>`);
           squareAnimation(square, "fail");
 
           // Incrementa o inicializa el conteo de intentos para esta posición
@@ -529,7 +529,7 @@ const AddSquare = () => {
     }
 
     //Primer mensaje de Consola: consola(Se va a intentar Introducir el numero $numero, numero)
-    enviarMensaje(`<n${numero}:>`, numero);
+    enviarMensaje(`<nSe procede a insertar el ${numero}:>`, numero);
     const posicion = await calcularPosicion(numero); // Usa await para esperar el resultado
 
     if (posicion === undefined) {

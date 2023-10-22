@@ -1,8 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import "./Consola.css";
 
+interface Message {
+  mensaje: string;
+  numero?: number;
+  index?: number;
+  color?: "white" | "gray";
+}
+
 interface ConsolaProps {
-  mensajes: { mensaje: string; numero?: number }[];
+  mensajes: Message[];
 }
 
 const Consola: React.FC<ConsolaProps> = (props) => {
@@ -54,16 +61,21 @@ const Consola: React.FC<ConsolaProps> = (props) => {
       <div className="console-header">Animation Console</div>
       <div className="console-content">
         {props.mensajes.map((mensajeObj, index) => (
-          <p
-            key={index}
-            className={
-              index === props.mensajes.length - 1
-                ? "last-message-highlight"
-                : ""
-            }
-            dangerouslySetInnerHTML={transformMessage(mensajeObj.mensaje)}
-          />
+          <div key={index} className="message-container">
+            <span className={`index ${mensajeObj.color}`}>
+              {mensajeObj.index}
+            </span>
+            <p
+              className={
+                index === props.mensajes.length - 1
+                  ? "last-message-highlight"
+                  : ""
+              }
+              dangerouslySetInnerHTML={transformMessage(mensajeObj.mensaje)}
+            />
+          </div>
         ))}
+
         <div ref={endOfMessagesRef}></div>
       </div>
     </div>
