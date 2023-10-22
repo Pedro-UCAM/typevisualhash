@@ -8,12 +8,6 @@
   /* Cambia el color de fondo a tu elección */
   background-color: #ecececf0; /* Cambia #ff0000 al código de color que desees */
 }
-
-
-.header {
-  margin-top: 10px;
-}
-
 .body-content {
   display: flex;
   justify-content: space-between;
@@ -47,10 +41,31 @@
 }
 
 .footer {
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
-/* ... Tus otros estilos ... */
+/* header */
+.header-segment {
+  background-color: #1b1c1d; /* Color de fondo oscuro predeterminado de Semantic UI */
+  width: 100%; /* Ocupa todo el espacio horizontal disponible */
+  padding: 15px 0; /* Espaciado vertical para darle algo de altura */
+  margin: 0; /* Eliminar cualquier margen predeterminado */
+  border-radius: 0; /* Hacer que las esquinas sean completamente cuadradas, sin bordes redondeados */
+}
+
+.header-segment .header {
+  color: #21ba45; /* Color de texto verde predeterminado de Semantic UI para darle contraste */
+  font-size: 1.5em; /* Tamaño de fuente más grande para que sea prominente */
+}
+
+/* Estilos responsivos para el header */
+@media (max-width: 768px) {
+  .header-segment .header {
+    font-size: 1.2em; /* Tamaño de fuente ligeramente más pequeño en dispositivos móviles */
+  }
+}
+
+/* Responsive */
 
 @media (max-width: 768px) {
   .body-content {
