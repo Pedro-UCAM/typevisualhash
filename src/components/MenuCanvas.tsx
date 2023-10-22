@@ -151,6 +151,7 @@ const AddSquare = () => {
       lockMovementY: true,
       hasControls: false, // Desactiva controles de tamaño y rotación
       lockRotation: true,
+      selectable: false, // Desactiva la selección
     });
 
     const arrowTip = new fabric.Triangle({
@@ -165,12 +166,17 @@ const AddSquare = () => {
       lockMovementY: true,
       hasControls: false, // Desactiva controles de tamaño y rotación
       lockRotation: true,
+      selectable: false, // Desactiva la selección
     });
 
     const arrowGroup = new fabric.Group([arrowBody, arrowTip], {
       left: square.left + square.width / 2 - 7, //Ajusto la posicion de la flecha para que este centrada con el cuadrado
       top: square.top - arrowTipSize - arrowBodyHeight, // Ajustamos la posición de la flecha para que esté justo encima del cuadrado
       selectable: false,
+      lockMovementX: true,
+      lockMovementY: true,
+      hasControls: false, // Desactiva controles de tamaño y rotación
+      lockRotation: true,
     });
 
     // Aplicamos el zoom
@@ -252,6 +258,7 @@ const AddSquare = () => {
               lockMovementY: true,
               lockRotation: true,
               hasControls: false, // Desactiva controles de tamaño y rotación
+              selectable: false, // Desactiva la selección
             });
 
             // Añadir el cuadrado al canvas
@@ -268,6 +275,7 @@ const AddSquare = () => {
               lockMovementY: true,
               hasControls: false, // Desactiva controles de tamaño y rotación
               lockRotation: true,
+              selectable: false, // Desactiva la selección
             });
 
             // Añadir el texto al canvas
@@ -327,6 +335,7 @@ const AddSquare = () => {
         lockMovementY: true,
         hasControls: false, // Desactiva controles de tamaño y rotación
         lockRotation: true,
+        selectable: false, // Desactiva la selección
         // Establece el punto de origen en el centro vertical
       });
 
